@@ -10,6 +10,16 @@
 ## Introduction
 
 Vue Vben Admin is a free and open source middle and back-end template. Using the latest `vue3`, `vite2`, `TypeScript` and other mainstream technology development, the out-of-the-box middle and back-end front-end solutions can also be used for learning reference.
+推送
+```
+echo "# hulingsaas" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/huanglishi/hulingsaas.git
+git push -u origin main
+``
 
 ## Feature
 

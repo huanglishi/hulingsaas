@@ -3,17 +3,17 @@ import { FormSchema } from '/@/components/Table';
 
 export const columns: BasicColumn[] = [
   {
-    title: '名称',
-    dataIndex: 'title',
+    title: '姓名',
+    dataIndex: 'name',
     width: 200,
   },
   {
-    title: '数量',
-    dataIndex: 'number',
+    title: '账号',
+    dataIndex: 'username',
   },
   {
-    title: '价格',
-    dataIndex: 'price',
+    title: '分组',
+    dataIndex: 'groupname',
   },
   {
     title: '状态',
@@ -21,7 +21,7 @@ export const columns: BasicColumn[] = [
     width: 120,
   },
   {
-    title: '提交时间',
+    title: '注册时间',
     dataIndex: 'createtime',
     width: 180,
     customRender: ({ record }) => {

@@ -2,24 +2,8 @@
   <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit" >
     <div class="oldformbox">
     <BasicForm @register="registerForm" >
-      <template #pid="{model, field}">
-        <a-select
-              v-model:value="model[field]"
-              show-search
-              allowClear
-              placeholder="选择分组"
-              style="width: 100%"
-              :default-active-first-option="false"
-              :show-arrow="false"
-              :filter-option="false"
-              :not-found-content="null"
-              @search="searchGroup"
-            >
-            <a-select-option v-for="item in grouplist"  :value="item['id']+''"><span v-html="item['name_txt']"></span></a-select-option>
-          </a-select>
-      </template>
       </BasicForm>
-      </div>
+    </div>
   </BasicModal>
 </template>
 <script lang="ts">
@@ -30,9 +14,9 @@
   import { Select} from 'ant-design-vue';
   import { formSchema } from './data';
   //API
-  import { getFormCateList,saveCate } from '/@/api/article/cate';
+  import { saveItem } from '/@/api/form/item';
   export default defineComponent({
-    name: 'FormModal',
+    name: 'ItemModal',
     components: { BasicModal, BasicForm, ASelect:Select,ASelectOption:Select.Option  },
     emits: ['success', 'register'],
     setup(_, { emit }) {
@@ -55,22 +39,11 @@
           rowId.value = data.record.id;
           setFieldsValue({
             ...data.record,
+            pid:data.record.pid+''
           });
         }
-        getGroupList("")
       });
-      //搜索分组
-      function searchGroup(val) {
-          getGroupList(val)
-      }
-      //获取分组数据
-      async function getGroupList(keyword){
-        let treeData= await getFormCateList({keyword:keyword})
-        if(!treeData) treeData=[]
-        let parntList : any=[{id: 0,name_txt: "--无--",pid: 0}];
-        grouplist.value = parntList.concat(treeData)
-      }
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增分类' : '编辑分类'));
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增表单项' : '编辑表单项'));
       async function handleSubmit() {
         try {
           const values = await validate();
@@ -80,7 +53,7 @@
           }
           try {
             createMessage.loading({ content: '提交中...', key:"saveArticle",duration:0});
-            const resultdata = await saveCate(values);
+            const resultdata = await saveItem(values);
             closeModal();
             if(resultdata){
               createMessage.success({ content: '提交成功！', key:"saveArticle", duration: 2 });
@@ -97,7 +70,7 @@
         }
       }
 
-      return { registerModal, registerForm, getTitle, handleSubmit,searchGroup,grouplist};
+      return { registerModal, registerForm, getTitle, handleSubmit,grouplist};
     },
   });
 </script>

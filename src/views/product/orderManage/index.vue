@@ -22,8 +22,8 @@
 <script lang="ts">
   import { defineComponent } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getList } from '/@/api/article/manage';
-  import { columns, searchFormSchema } from './role.data';
+  import { getList } from '/@/api/product/order';
+  import { columns, searchFormSchema } from './data';
   import { Icon } from '/@/components/Icon';
   import { Popconfirm } from 'ant-design-vue';
   export default defineComponent({
@@ -48,7 +48,7 @@
           title: '操作',
           dataIndex: 'action',
           // slots: { customRender: 'action' },
-          fixed: undefined,
+          // fixed: undefined,
         },
       });
 

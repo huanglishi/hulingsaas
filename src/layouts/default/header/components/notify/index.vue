@@ -1,6 +1,6 @@
 <template>
   <div :class="prefixCls">
-    <Popover title="" trigger="click" :overlayClassName="`${prefixCls}__overlay`">
+    <Popover title="" trigger="click" :overlayClassName="`${prefixCls}__overlay`" @visibleChange="visibleChange">
       <Badge :count="count" dot :numberStyle="numberStyle">
         <BellOutlined />
       </Badge>
@@ -31,6 +31,7 @@
   import { getList ,setRead} from '/@/api/sys/message';
   import NoticeList from './NoticeList.vue';
   import { useDesign } from '/@/hooks/web/useDesign';
+import { func } from 'vue-types';
   // import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
@@ -64,7 +65,12 @@
         }
         mlist.value=nlist
       }
-      getMesage()
+      //获取数据
+      function visibleChange(visible){
+        if(visible){
+          getMesage()
+        }
+      }
       async function onNoticeClick(record: ListItem) {
         if(!record.isread){
           const result=await setRead({ids:record.id})
@@ -79,6 +85,7 @@
         prefixCls,
         count,mlist,
         onNoticeClick,
+        visibleChange,
         numberStyle: {},
       };
     },

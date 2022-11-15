@@ -1,5 +1,5 @@
 /**
- * 文章分类
+ * 产品分类
  */
  import { defHttp } from '/@/utils/http/axios';
 

@@ -1,5 +1,5 @@
 /**
- * 文章列表数据
+ * 产品列表
  */
  import { defHttp } from '/@/utils/http/axios';
 

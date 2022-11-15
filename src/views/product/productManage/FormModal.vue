@@ -21,7 +21,7 @@
                   <FormItem label="产品分类" name="cid">
                      <div class="formFlex">
                         <div class="left">
-                          <a-select
+                          <Select
                             v-model:value="formData.cid"
                             mode="multiple"
                             placeholder="请选择分类"
@@ -37,12 +37,51 @@
                             <template #option="{ value: id, name_txt }">
                               <span role="img" :aria-label="id" v-html="name_txt"></span>
                             </template>
-                          </a-select>
+                          </Select>
                         </div>
                         <div class="right">
                           <a-button @click="openCate">分类管理</a-button>
                         </div>
                      </div>
+                  </FormItem>
+                   <!--参数值-->
+                  <FormItem name="pro_val">
+                    <div class="probox">
+                      <div class="pro_header"><span class="showbtn" @click="()=>{showpro=!showpro}"><Icon :icon="showpro?'radix-icons:triangle-down':'radix-icons:triangle-right'" size="18" color="#262626"></Icon>产品参数：</span> <a class="showbtn"  @click="handelOpenPro">【参数管理】</a></div>
+                      <div class="pro_list" v-show="showpro">
+                        <Row v-if="prolist&&prolist.length>0">
+                          <template v-for="item in prolist">
+                            <Col :span="12">
+                              <a-form-item-rest>
+                               <div class="field">
+                                  <div class="label">{{item.name}}：</div>
+                                  <div class="text">
+                                    <a-input v-if="item.type==1" v-model:value="item.val" :placeholder="`请填写${item.name}`" style="width: 100%;"/>
+                                    <AutoComplete
+                                      v-else
+                                      v-model:value="item.val"
+                                      class="certain-category-search"
+                                      dropdown-class-name="certain-category-search-dropdown"
+                                      :dropdown-match-select-width="235"
+                                      :options="item.vallist"
+                                    >
+                                      <template #option="item">
+                                        <div style="display: flex; justify-content: space-between">
+                                            {{ item.value }}
+                                            <span>
+                                            </span>
+                                          </div>
+                                      </template>
+                                      <a-input :placeholder="`请填写${item.name}`" style="width: 100%;"/>
+                                    </AutoComplete>
+                                  </div>
+                               </div>
+                              </a-form-item-rest>
+                            </Col>
+                          </template>
+                        </Row>
+                      </div>
+                    </div>
                   </FormItem>
                   <FormItem label="产品图片" name="images">
                     <div class="empyupbtn" v-if="!formData.images||formData.images.length==0" @click="handleFileManage">
@@ -129,11 +168,13 @@
       <FileManage  @register="registerFileManage" @success="selectImg"></FileManage>
        <!--分组-->
       <cateModal @register="cateModals"  @upcateData="upCateData"/>
+       <!--参数管理-->
+      <proModal @register="proModals"  @upcateData="upProData"/>
      </div>
   </BasicModal>
 </template>
 <script lang="ts">
-  import { defineComponent, ref, computed,reactive, unref,toRefs } from 'vue';
+  import { defineComponent, ref, computed,reactive, unref,toRefs, nextTick } from 'vue';
   import dayjs, {  } from 'dayjs';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { useModal } from '/@/components/Modal';
@@ -141,16 +182,19 @@
   import { Icon } from '/@/components/Icon';
   import { createImgPreview } from '/@/components/Preview/index';
   import cateModal from './cateModal.vue';
+  import proModal from './proModal.vue';
   //API
   import { getFormCateList } from '/@/api/product/cate';
   import { saveProduct ,getProduct} from '/@/api/product/manage';
+  import { getList } from '/@/api/product/pro';
   //组件
-  import { Tabs,TabPane,Form,FormItem,RadioGroup,Radio,DatePicker,Select,FormInstance } from 'ant-design-vue';
+  import { Tabs,TabPane,Form,FormItem,RadioGroup,Radio,DatePicker,Select,FormInstance,Row,Col,AutoComplete} from 'ant-design-vue';
   import { ReplaceUrl } from '/@/utils/imgurl';
   import { Tinymce } from '/@/components/Tinymce/index';
   import {PlusOutlined,PhoneOutlined} from '@ant-design/icons-vue';
   import { FileManage } from '/@/components/FileManage';
   import vuedraggable from 'vuedraggable' //拖拽组件
+  import {  ProItem,ProItemVal } from './data';
   // 局部引入element UI
    import { ElScrollbar } from 'element-plus'
   export default defineComponent({
@@ -158,18 +202,21 @@
     components: { 
       BasicModal, Tinymce,PlusOutlined,PhoneOutlined,FileManage,Icon,
       // BasicForm,
-      Tabs,TabPane,Form,FormItem,RadioGroup,Radio,DatePicker,ASelect:Select,
-      ElScrollbar,cateModal,vuedraggable,
+      Tabs,TabPane,Form,FormItem,RadioGroup,Radio,DatePicker,Select,Row,Col,AutoComplete,AFormItemRest:Form.ItemRest,
+      ElScrollbar,cateModal,vuedraggable,proModal,
     },
     emits: ['success', 'register'],
     setup(_, { emit }) {
       const formRef = ref<FormInstance>();
       const isUpdate = ref(true);
       const rowId = ref('');
-      //分组
+      //弹框
       const [cateModals, { openModal: openCate }] = useModal();//分组
+      const [proModals, { openModal: openPro }] = useModal();//参数
       //表单数据
       const arr_images: string[] = [] // 定义字符串数组
+      const pro_item: ProItem[] = [] // 产品参数
+      const pro_item_val: ProItemVal[] = [] // 产品参数
       const initform={
         type:0,
         cid:[],
@@ -177,6 +224,7 @@
         des:"",
         content:"",
         releasetime:dayjs(dateFormat(0), "YYYY-MM-DD HH:mm"),
+        pro_list:pro_item_val,
         images:arr_images,
         views:50,
       }
@@ -187,6 +235,8 @@
         fetching:false,
         upLoading:false,
         cateList:[],
+        prolist:pro_item,//参数列表
+        showpro:true,//是否显示参数
       })
       const {createMessage,} = useMessage();
       //上传附件
@@ -216,6 +266,10 @@
         if(treeData){
           pagedata.cateList=treeData
         }
+        //获取参数
+        nextTick(()=>{
+          upProData()
+        })
       });
       const getTitle = computed(() => (!unref(isUpdate) ? '新增产品' : '编辑产品'));
       function fetchCate(){
@@ -227,6 +281,16 @@
            await (formRef.value?.validate())
           const values =pagedata.formData;
           // const values = await validate();
+          //参数
+          if(pagedata.prolist&&pagedata.prolist.length>0){
+            values.pro_list=[]
+            pagedata.prolist.forEach((item)=>{
+              values.pro_list.push({
+                id:item.id,
+                val:item.val,
+              })
+            })
+          }
           setModalProps({ confirmLoading: true });
           try {
             createMessage.loading({ content: '提交中...', key:"saveArticle",duration:0});
@@ -303,6 +367,16 @@
           pagedata.cateList=treeData
         }
       }
+      //参数更新数据
+      async function upProData(){
+         const prolist = await getList({from:"product",product_id:rowId.value});
+        if(prolist){
+          pagedata.prolist=prolist
+        }
+      }
+      function handelOpenPro(){
+        openPro(true)
+      }
       return { 
         ...toRefs(pagedata),
         getTitle, 
@@ -329,6 +403,8 @@
         previewImg,removeImg,
         //分组
         upCateData,cateModals,openCate,
+        //参数
+        upProData,proModals,handelOpenPro,
        };
     },
   });
@@ -535,5 +611,36 @@
           }
         }
    
+  }
+  //参数
+  .probox{
+    width: 660px;
+    padding-left:  30px;
+    .pro_header{
+      color: rgba(0, 0, 0, 0.85);
+      font-size: 14px;
+      .showbtn{
+        user-select: none;
+        cursor: pointer;
+      }
+    }
+    .pro_list{
+      margin-top: 10px;
+      .field{
+        display: flex;
+        margin-bottom: 10px;
+        .label{
+           width: auto;
+           display: flex;
+           align-items: center;
+           justify-content: flex-end;
+           min-width: 80px;
+        }
+        .text{
+          flex:1;
+        }
+      }
+
+    }
   }
 </style>

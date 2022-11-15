@@ -38,4 +38,7 @@ provide('reload', reload)
         margin: 0px;
         padding: 0px;
       }
+      .oldformbox{
+        padding: 20px;
+      }
 </style>

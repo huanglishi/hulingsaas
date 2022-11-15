@@ -179,3 +179,17 @@ export const formSchema: FormSchema[] = [
     component: 'InputTextArea',
   },
 ];
+//参数列表
+export interface ProItem {
+  id:number;
+  type: number;
+  keyname: string;
+  name: string;
+  val:string;
+  vallist:[];
+}
+//参数返回值
+export interface ProItemVal {
+  id:number;
+  val:string;
+}

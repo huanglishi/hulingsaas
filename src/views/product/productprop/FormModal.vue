@@ -1,13 +1,12 @@
 <template>
-  <div class="funcard bg-white">
+  <BasicModal :showCancelBtn="false" v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit" width="620px">
     <div class="listbox">
       <!--表单-->
       <div class="tablebox" v-loading="loadingRef" loading-tip="加载中...">
         <table style="table-layout: fixed;">
             <thead>
               <tr>
-                <th class="fistth">参数项名称</th>
-                <th class="alcenter">说明</th>
+                <th class="fistth">参数值</th>
                 <th class="alcenter">启用</th>
                 <th class="alcenter" style="width:60px;">排序</th>
                 <th class="alcenter">操作</th>
@@ -19,17 +18,9 @@
                   <td class="table-cell">
                     <div class="editbox">
                       <div class="inputbox" v-if="item.edit">
-                        <a-input v-model:value="item.name" placeholder="填写参数项名称" />
+                        <a-input v-model:value="item.value" placeholder="填写参数值" @pressEnter="handelSavePro(item)"/>
                       </div>
-                      <div class="text" v-else>{{item.name}}</div>
-                    </div>
-                  </td>
-                  <td class="table-cell alcenter">
-                    <div class="editbox">
-                      <div class="inputbox" v-if="item.edit&&item.type==0">
-                        <a-input v-model:value="item.des" placeholder="填写参数说明" />
-                      </div>
-                      <div class="text destext" v-else>{{item.des}}</div>
+                      <div class="text" v-else>{{item.value}}</div>
                     </div>
                   </td>
                   <td class="table-cell alcenter">
@@ -48,8 +39,7 @@
                   <td class="table-cell alleft operat">
                       <a class="" v-if="item.edit==false" @click="()=>{item.edit=true}">编辑</a>
                       <a class="" v-if="item.edit==true" @click="handelSavePro(item)">保存</a>
-                      <a v-if="item.type==0" @click="handelDelPro(item)">删除</a>
-                      <a v-if="item.id>0&&(item.type !=1)" @click="manageProList(item.id,item.name)">管理值</a>
+                      <a   @click="handelDelPro(item)">删除</a>
                   </td>
                 </tr>
               </template>
@@ -62,51 +52,51 @@
         </div>
       </div>
     </div>
-      <!--管理值-->
-      <FormModal @register="registerModal" />
-  </div>
+  </BasicModal>
 </template>
 <script lang="ts">
-  import { defineComponent ,reactive,toRefs,onMounted} from 'vue';
+  import { defineComponent, ref,reactive,toRefs, nextTick} from 'vue';
+  import { BasicModal, useModalInner } from '/@/components/Modal';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { Icon } from '/@/components/Icon';
-  import { useModal } from '/@/components/Modal';
-  import { Progress,Checkbox,Pagination,Switch} from 'ant-design-vue';
-  //API
-  import { getList,savePro,delPro,upPro,upWeigh} from '/@/api/product/pro';
-  import {  ProItem } from './data';
+  import { ProlistItem } from './data';
   import { buildUUID} from '/@/utils/uuid';
-  //数据值
-  import FormModal from './FormModal.vue';
+  import {Switch} from 'ant-design-vue';
+  import { Icon } from '/@/components/Icon';
+  //API
+  import { getProlist,saveProlist,delProlist,upProlist,upWeighlist} from '/@/api/product/prolist';
   export default defineComponent({
-    name: 'productprop',
-    components: { Icon,Progress,ACheckbox:Checkbox,Pagination,Switch,FormModal},
-    emits: ['upcateData'],
-    setup(_, { emit }) {
-      const {createMessage,createConfirm} = useMessage();
-      const [registerModal, { openModal }] = useModal();
-      //定义页面变量
-      const proitem: ProItem[] = [] // 定义整数型数组
-      // const arrselectid: number[] = [] // 定义字符串数组
+    name: 'FormModal',
+    components: { BasicModal,Switch,Icon },
+    emits: ['success', 'register'],
+    setup() {
+      const proitem: ProlistItem[] = [] // 定义整数型数组
       const pagedata=reactive({
+        pro_id:0,
         list:proitem,
         loadingRef:true,
       })
-      //组件加载完成执行
-      onMounted(() => {
-        getprolist()
+      const {createMessage,createConfirm} = useMessage();
+      const getTitle = ref('编辑参数值');
+      const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+        setModalProps({ confirmLoading: false });
+        getTitle.value=`编辑“${data.title}”值`
+        pagedata.pro_id=data.id
+        nextTick(()=>{
+          ongetProList()
+        })
       });
-      //获取参数列表
-      async function getprolist(){
-        pagedata.loadingRef = true;
-        const getdbdata = await getList({from:"pro"});
-        if(getdbdata){
-          pagedata.list=getdbdata
-        }
+      //获取参数值数据
+      async function ongetProList(){
+        pagedata.loadingRef = true
+        pagedata.list = await getProlist({pro_id:pagedata.pro_id})
         pagedata.loadingRef = false;
       }
-      //删除参数
-      function handelDelPro(item){
+      //关闭
+      async function handleSubmit() {
+        closeModal();
+      }
+       //删除参数
+       function handelDelPro(item){
         if(item.id>0){
           createConfirm({
             iconType: "warning",
@@ -114,9 +104,8 @@
             content: '删除后将无法恢复！',
             onOk:(async()=>{
               createMessage.loading({ content: '删除中...', key:"delPro",duration:0});
-              const resultdata = await delPro({ids:[item.id]});
+              const resultdata = await delProlist({ids:[item.id]});
               if(resultdata){
-                emit('upcateData');
                 pagedata.list=pagedata.list.filter((data)=>data.id!=item.id)
                 createMessage.success({ content: '删除成功！', key:"delPro", duration: 2 });
               }else {
@@ -132,12 +121,10 @@
       function handleAdd(){
         pagedata.list.push({
           id:0,
-          type: 0,
+          pro_id:pagedata.pro_id,
           weigh: 0,
           status: 0,
-          keyname: "",
-          name: "",
-          des: "",
+          value: "",
           uuid:buildUUID(),
           edit: true,//是否编辑
         })
@@ -146,12 +133,11 @@
       async function handelSavePro(item){
         try {
             createMessage.loading({ content: '保存中...', key:"savePro",duration:0});
-            const resultdata = await savePro(item);
+            const resultdata = await saveProlist(item);
             if(resultdata){
               item.edit=false
               item.id=resultdata
               item.weigh=resultdata
-              emit('upcateData');
               createMessage.success({ content: '提交成功！', key:"savePro", duration: 2 });
             }
           } catch {
@@ -162,9 +148,8 @@
       async function handelUpPro(item){
           try {
             createMessage.loading({ content: '更新状态中...', key:"upPro",duration:0});
-            const resultdata = await upPro({id:item.id,status:item.status});
+            const resultdata = await upProlist({id:item.id,status:item.status});
             if(resultdata){
-              emit('upcateData');
               createMessage.success({ content: '更新成功！', key:"upPro", duration: 2 });
             }else if(resultdata==0){
               createMessage.success({ content: '已更新！', key:"upPro", duration: 2 });
@@ -177,9 +162,9 @@
       async function handelUpWeigh(id,weigh,rpId,rpweigh){
         try {
             createMessage.loading({ content: '更新排序中...', key:"upPro",duration:0});
-            const resultdata = await upWeigh({id:id,weigh:weigh,rpId:rpId,rpweigh:rpweigh});
+            const resultdata = await upWeighlist({id:id,weigh:weigh,rpId:rpId,rpweigh:rpweigh});
             if(resultdata){
-              getprolist()
+              ongetProList()
               createMessage.success({ content: '更新成功！', key:"upPro", duration: 2 });
             }else if(resultdata==0){
               createMessage.success({ content: '已更新！', key:"upPro", duration: 2 });
@@ -188,62 +173,23 @@
             createMessage.destroy("upPro");
           }
       }
-      //管理值
-      function manageProList(id,title){
-        openModal(true, {
-          id: id,
-          title: title,
-        });
-      }
-      return {
+      return { 
+        registerModal, 
+        getTitle, 
+        handleSubmit,
         ...toRefs(pagedata),
         handleAdd,handelDelPro,handelSavePro,handelUpPro,handelUpWeigh,
-        registerModal,manageProList,
       };
     },
   });
 </script>
 <style lang="less" scoped>
-.funcard{
-  margin: 20px;
-  background-color: #fff;
-  border-radius: 5px;
-  overflow: hidden;
-  //基本信息
-  .baseinfo{
-    .raw{
-      height: 50px;
-      display: flex;
-      align-items: center;
-      .lf{
-        padding: 10px;
-      }
-      .md{
-        padding: 10px;
-        display: flex;
-        .text{
-
-        }
-        .pree{
-          width:200px;
-        }
-      }
-      .rt{
-        padding: 10px;
-        flex:1;
-        padding-left: 50px;
-        .use{
-           padding-left: 10px;
-        }
-      }
-    }
-  }
-  //内容
-  .listbox{
+.listbox{
+  min-height: 520px;
     .tablebox{ 
       padding: 20px;
       table{
-        width: 720px;
+        width: 100%;
         text-align: left;
         border-radius: 2px 2px 0 0;
         border-collapse: separate;
@@ -313,19 +259,15 @@
     }
     //添加按钮
     .addbtn{
-      width: 720px;
+      width: 100%;
       margin-top: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
       .inlinebtn{
         width: 100%;
-        .mt-5{
-        }
       }
     }
    }
   }
-}
 </style>
-  

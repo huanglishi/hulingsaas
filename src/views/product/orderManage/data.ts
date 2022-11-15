@@ -8,6 +8,14 @@ export const columns: BasicColumn[] = [
     width: 200,
   },
   {
+    title: '订单号',
+    dataIndex: 'out_trade_no',
+  },
+  {
+    title: '商户订单号',
+    dataIndex: 'transaction_id',
+  },
+  {
     title: '数量',
     dataIndex: 'number',
   },
@@ -39,13 +47,15 @@ export const columns: BasicColumn[] = [
       return Y + M + D +H +S
     },
   },
-  {
-    title: '备注',
-    dataIndex: 'des',
-  },
 ];
 
 export const searchFormSchema: FormSchema[] = [
+  {
+    field: 'title',
+    label: '名称',
+    component: 'Input',
+    colProps: { span: 8 },
+  },
   {
     field: 'title',
     label: '名称',

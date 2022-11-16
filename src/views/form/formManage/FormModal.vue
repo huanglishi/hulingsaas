@@ -11,7 +11,7 @@
       </div>
       <div class="tabs-content">
         <el-scrollbar height="550px">
-          <Form ref="formRef" :model="formData" @finishFailed="onFinishFailed">
+          <Form ref="formRef" :model="formData" >
           <div class="content_box">
               <!--基础信息-->
               <div class="besecontent" v-show="activeKey==1">
@@ -35,24 +35,54 @@
                             <tr>
                               <th class="fistth">项名称</th>
                               <th class="alcenter">表单项内容</th>
-                              <th class="alcenter">显示</th>
-                              <th class="alcenter">必填</th>
-                              <th class="alcenter" style="width:60px;">排序</th>
-                              <th class="alcenter">操作</th>
+                              <th class="alcenter" style="width:70px;">显示</th>
+                              <th class="alcenter" style="width:70px;">必填</th>
+                              <th class="alcenter" style="width:70px;">排序</th>
+                              <th class="alcenter" style="width:90px;">操作</th>
                             </tr>
                           </thead>
                           <tbody class="table-tbody">
                             <template v-for="(item,index) in formData.formItem">
                               <tr>
                                 <td class="table-cell">
-                                  <div class="text" >{{item.name}}</div>
+                                  <div class="textname" >{{item.name}}</div>
                                 </td>
                                 <td class="table-cell alcenter">
                                   <div class="valuebox">
-                                    <div class="inputbox" v-if="item.type=='input'">
-                                      <a-input v-model:value="item.value" placeholder="填写表单值" />
+                                    <div class="inputbox" v-if="['input','date','mobile','IDcard','email'].indexOf(item.type)>-1">
+                                       <a-input v-model:value="item.value" :placeholder="item.placeholder" disabled/>
                                     </div>
-                                    <div class="text destext" v-else>{{item.value}}</div>
+                                    <div class="inputbox" v-if="['textarea'].indexOf(item.type)>-1">
+                                       <a-textarea v-model:value="item.value" :placeholder="item.placeholder" disabled/>
+                                    </div>
+                                    <div class="radiobox" v-else-if="['radio'].indexOf(item.type)>-1">
+                                      <a-radio-group v-model:value="item.value">
+                                          <a-radio v-for="optext in optionToArray(item.option)" :value="optext" >{{optext}}</a-radio>
+                                        </a-radio-group>
+                                    </div>
+                                    <div class="radiobox" v-else-if="['select'].indexOf(item.type)>-1">
+                                      <a-select
+                                        allowClear
+                                        style="width: 100%"
+                                        :placeholder="item.placeholder"
+                                      >
+                                        <a-select-option  v-for="optext in optionToArray(item.option)" :value="optext">{{optext}}</a-select-option>
+                                       </a-select>
+                                    </div>
+                                    <div class="radiobox" v-else-if="['address'].indexOf(item.type)>-1">
+                                      <a-select
+                                        disabled
+                                        style="width: 100%"
+                                        placeholder="选择地址"
+                                      >
+                                       </a-select>
+                                    </div>
+                                    <div class="imgbox" v-else-if="['image'].indexOf(item.type)>-1">
+                                      <div class="btn">
+                                        <a-button>上传图片</a-button>
+                                      </div>
+                                      <div class="info">最大可上传{{item.number}}张</div>
+                                    </div>
                                   </div>
                                 </td>
                                 <td class="table-cell alcenter">
@@ -72,6 +102,15 @@
                                   </div>
                                 </td>
                                 <td class="table-cell alleft operat">
+                                   <div class="opbtn">
+                                     <div class="op_left" @click="handelEditItem(index,item)">
+                                      <Icon icon="clarity:note-edit-line" color="#0960bd" size="18"/>
+                                     </div>
+                                     <div class="op_midle"></div>
+                                     <div class="op_right"  @click="handelDelItem(index,item)">
+                                      <Icon icon="ant-design:delete-outlined" color="#ED6F6F" size="18"/>
+                                     </div>
+                                   </div>
                                 </td>
                               </tr>
                             </template>
@@ -89,13 +128,22 @@
               </div>
               <!--高级信息-->
               <div class="hcontent" v-show="activeKey==2">
+                <FormItem label="按钮文字" name="button_text" :rules="[{ required: true }]">
+                  <a-input v-model:value="formData.button_text" placeholder="请输入提交按钮文字" maxlength="50" style="width: 410px;" allow-clear/>
+                </FormItem>
+                <FormItem label="提交成功提示" name="success_tig" :rules="[{ required: true }]">
+                  <a-input v-model:value="formData.success_tig" placeholder="请输入提交成功提示语" maxlength="150" style="width: 410px;" allow-clear/>
+                </FormItem>
+                <FormItem label="备注" name="des">
+                  <a-textarea v-model:value="formData.des" placeholder="填写表单的备注" :rows="4" show-count :maxlength="255" allow-clear style="width: 410px;"/>
+                </FormItem>
               </div>
           </div>
         </Form>
         </el-scrollbar>
       </div>
         <!--表单项-->
-        <ItemModal @register="ItemModals"  @upcateData="upItemData"/>
+        <ItemModal @register="ItemModals"  @success="upItemData"/>
      </div>
   </BasicModal>
 </template>
@@ -107,10 +155,10 @@
   import ItemModal from './ItemModal.vue';
   import { useModal } from '/@/components/Modal';
   //API
-  import { upWeigh ,getItemList ,upItem} from '/@/api/form/item';
+  import { upWeigh ,getItemList ,upItem,upRequired,delItem} from '/@/api/form/item';
   import { saveForm } from '/@/api/form/manage';
   //组件
-  import { Tabs,TabPane,Form,FormItem,RadioGroup,Radio,DatePicker,Select,FormInstance } from 'ant-design-vue';
+  import { Tabs,TabPane,Form,FormItem,Radio,DatePicker,Select,FormInstance,Switch} from 'ant-design-vue';
   import { ReplaceUrl } from '/@/utils/imgurl';
   import { Tinymce } from '/@/components/Tinymce/index';
   import {PlusOutlined,PhoneOutlined} from '@ant-design/icons-vue';
@@ -123,51 +171,52 @@
     components: { 
       BasicModal, Tinymce,PlusOutlined,PhoneOutlined,FileManage,Icon,ItemModal,
       // BasicForm,
-      Tabs,TabPane,Form,FormItem,RadioGroup,Radio,DatePicker,ASelect:Select,
+      Tabs,TabPane,Form,FormItem,ARadio:Radio,ARadioGroup:Radio.Group,DatePicker,ASelect:Select,ASelectOption:Select.Option,Switch,
       ElScrollbar,
     },
     emits: ['success', 'register'],
     setup(_, { emit }) {
       const formRef = ref<FormInstance>();
       const isUpdate = ref(true);
-      const rowId = ref('');
       //表单项
       const [ItemModals, { openModal: openItem }] = useModal();//编辑表单项
       //表单数据
       const form_item: Form_item[] = [] // 定义表单项自结构
       const initform={
+        id:0,
         name:"",
         des:"",
+        button_text:"提交",
+        success_tig:"数据已提交成功",
         formItem:form_item
       }
       const pagedata=reactive({
         formData:initform,
         activeKey:1,
-        form_id:0,
       })
-      const {createMessage,} = useMessage();
+      const {createMessage,createConfirm} = useMessage();
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
         await formRef.value?.resetFields()//重置表单
         pagedata.activeKey=1
         setModalProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
         if (unref(isUpdate)) {
-          pagedata.form_id = data.record.id;
           //获取内容
+          pagedata.formData.id=data.record.id
           pagedata.formData.name=data.record.name
           pagedata.formData.des=data.record.des
           //获取对用的表单项
           onGetFormItem()
         }else{
           pagedata.formData= initform
-          pagedata.form_id =0
+          pagedata.formData.formItem=[]
         }
       });
       //获取表单项数据
       async function onGetFormItem(){
-        const fdata = await getItemList({form_id:pagedata.form_id});
+        const fdata = await getItemList({form_id: pagedata.formData.id});
           if(fdata){
-            pagedata.formData=fdata
+            pagedata.formData.formItem=fdata
           }
       }
       const getTitle = computed(() => (!unref(isUpdate) ? '新增表单' : '编辑表单'));
@@ -176,7 +225,6 @@
         try {
            if(await (formRef.value?.validate())){
             const values =pagedata.formData;
-              // const values = await validate();
               setModalProps({ confirmLoading: true });
               try {
                 createMessage.loading({ content: '提交中...', key:"saveForm",duration:0});
@@ -184,7 +232,7 @@
                 closeModal();
                 if(resultdata){
                   createMessage.success({ content: '提交成功！', key:"saveForm", duration: 2 });
-                  emit('success', { isUpdate: unref(isUpdate), values: { ...values, id: rowId.value } });
+                  emit('success', { isUpdate: unref(isUpdate), values: { ...values } });
                 }else if(resultdata==0){
                   createMessage.success({ content: '已提交！', key:"saveForm", duration: 2 });
                 }
@@ -199,12 +247,6 @@
         }
       }
       /***********************函数*********************************************************************** */
-      //错误返回
-      function onFinishFailed({ values, errorFields, outOfDate }) {
-        console.log("表单验证失败",values)
-        console.log("表单验证失败",errorFields)
-        console.log("表单验证失败",outOfDate)
-      };
       //更新状态
       async function handelUpForm(item){
           try {
@@ -222,8 +264,8 @@
       //更新必填
       async function handelUpRequired(item){
           try {
-            createMessage.loading({ content: '更新状态中...', key:"upPro",duration:0});
-            const resultdata = await upItem({id:item.id,status:item.status});
+            createMessage.loading({ content: '更新必填状态中...', key:"upPro",duration:0});
+            const resultdata = await upRequired({id:item.id,required:item.required});
             if(resultdata){
               createMessage.success({ content: '更新成功！', key:"upPro", duration: 2 });
             }else if(resultdata==0){
@@ -252,18 +294,51 @@
       function handelAddItem(){
         openItem(true,{
           isUpdate: false,
+          record:{form_id: pagedata.formData.id}
         })
       }
       //编辑表单项
-      function handelEditItem(record){
+      function handelEditItem(index,record){
         openItem(true,{
           record,
-          isUpdate: false,
+          index:index,
+          isUpdate: true,
         })
       }
+      //删除表单项
+      function handelDelItem(index,record){
+         if(record.id==0){
+          pagedata.formData.formItem.splice(index, 1); 
+         }else{
+              createConfirm({
+                iconType: "warning",
+                title: '您确定删除吗？',
+                content: '删除后将无法恢复！',
+                onOk:(async()=>{
+                  createMessage.loading({ content: '删除中...', key:"delItem",duration:0});
+                  const resultdata = await delItem({ids:[record.id]});
+                  if(resultdata){
+                    pagedata.formData.formItem=pagedata.formData.formItem.filter((data)=>data.id!=record.id)
+                    createMessage.success({ content: '删除成功！', key:"delItem", duration: 2 });
+                  }else {
+                    createMessage.error({ content: '删除失败', key:"delItem", duration: 2 });
+                  }
+                })
+              });
+         }
+      }
       //编辑表单项返回
-      function upItemData(){
-
+      function upItemData(tiem){
+        if(tiem.isUpdate){
+          pagedata.formData.formItem[tiem.index]=tiem.values
+        }else{
+          pagedata.formData.formItem.push(tiem.values)
+        }
+      }
+      //文本选项转数组
+      function optionToArray(data){
+        var snsArr =data.split(/[(\r\n)\r\n]+/);
+        return snsArr
       }
       return { 
         ...toRefs(pagedata),
@@ -282,10 +357,10 @@
         ReplaceUrl,
         //form
         formRef,
-        onFinishFailed,
         //表单
         handelUpWeigh,handelUpForm,upWeigh,handelUpRequired,
-        handelAddItem,upItemData,ItemModals,handelEditItem,
+        handelAddItem,upItemData,ItemModals,handelEditItem,handelDelItem,
+        optionToArray,
        };
     },
   });
@@ -514,6 +589,38 @@
           text-align: center;
           padding: 20px;
         }
+        //操作
+        .opbtn{
+          display: flex;
+          .op_left{
+            flex:1;
+            user-select: none;
+            cursor: pointer;
+          }
+          .op_midle{
+            position: relative;
+            top: 4px;
+            display: inline-block;
+            height: 0.9em;
+            vertical-align: middle;
+            border-top: 0;
+            border-left: 1px solid rgba(0, 0, 0, 0.06);
+            display: table;
+            box-sizing: border-box;
+            padding: 0;
+            color: rgba(0, 0, 0, 0.85);
+            font-size: 14px;
+            font-variant: tabular-nums;
+            line-height: 1.5715;
+            list-style: none;
+            margin: 0 8px;
+          }
+          .op_right{
+            flex:1;
+            user-select: none;
+            cursor: pointer;
+          }
+        }
       }
       table>thead>tr:first-child th:first-child {
           border-top-left-radius: 2px;
@@ -521,11 +628,17 @@
       table>thead>tr>th{
         border-right: 1px solid #e3e2e8;
       }
+      table>tbody>tr>td{
+        padding: 10px;
+      }
       table>thead>tr>th:last-child{
         border-right: 0px solid #e3e2e8;
       }
     .table-tbody{
       .table-cell{
+        .textname{
+          padding-left: 10px;
+        }
         .editbox{
           height: 35px;
           .inputbox{
@@ -544,7 +657,20 @@
         text-align: left;
         padding-left: 25px;
       }
+      .radiobox{
+        text-align: left;
+      }
+      .imgbox{
+        display: flex;
+        align-items: center;
+        .info{
+          flex:1;
+        }
+      }
     }
    }
+  }
+  :deep(.ant-form-horizontal .ant-form-item-label){
+    min-width: 100px;
   }
 </style>

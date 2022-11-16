@@ -73,5 +73,66 @@ export interface Form_item {
   name: string;
   value:string;
   required:number;
-  uuid: string;
+  placeholder:string;//提示
+  wordlimit:number;//字数限制
+  option:string;//下拉选项
+  number:number;//上传图片数量
 }
+//表单项类型
+export const formTypeList = [
+  {
+    name: '单行文本',
+    type:"input",
+    icon: 'fluent:text-field-16-regular',
+  },
+  {
+    name: '单选按钮',
+    type:"radio",
+    icon: 'gg:radio-checked',
+  },
+  {
+    name: '多选按钮',
+    type:"checkbox",
+    icon: 'carbon:checkbox-checked',
+  },
+  {
+    name: '日期选项',
+    type:"date",
+    icon: 'uiw:date',
+  },
+  {
+    name: '手机号',
+    type:"mobile",
+    icon: 'octicon:device-mobile-24',
+  },
+  {
+    name: '上传图片',
+    type:"image",
+    icon: 'ooui:image-add-ltr',
+  },
+  {
+    name: '下拉选项',
+    type:"select",
+    icon: 'gg:select-r',
+  },
+  {
+    name: '多行文本',
+    type:"textarea",
+    icon: 'bi:textarea-resize',
+  },
+  {
+    name: '省市县区',
+    type:"address",
+    icon: 'entypo:location',
+  },
+  {
+    name: '身份验证',
+    type:"IDcard",
+    icon: 'fa6-regular:address-card',
+  },
+  {
+    name: '邮箱验证',
+    type:"email",
+    icon: 'ic:outline-email',
+  },
+];

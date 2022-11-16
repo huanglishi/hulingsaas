@@ -9,7 +9,13 @@
           <TableAction
             :actions="[
               {
+                icon: 'mdi:text-box-search-outline',
+                tooltip: '查看提交数据',
+                onClick: handleView.bind(null, record),
+              },
+              {
                 icon: 'clarity:note-edit-line',
+                tooltip: '编辑表单',
                 onClick: handleEdit.bind(null, record),
               },
               {
@@ -37,6 +43,7 @@
   import { Icon } from '/@/components/Icon';
   import { Popconfirm,Tag } from 'ant-design-vue';
   import { useModal } from '/@/components/Modal';
+  import { useGo } from '/@/hooks/web/usePage';
   //组件
   import FormModal from './FormModal.vue';
   //api
@@ -45,6 +52,7 @@
     name: 'formManage',
     components: { BasicTable, TableAction, FormModal,Icon,[Popconfirm.name]:Popconfirm,[Tag.name]:Tag},
     setup() {
+      const go = useGo();
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload,updateTableDataRecord}] = useTable({
         title: '表单列表',
@@ -60,7 +68,7 @@
         bordered: true,
         showIndexColumn: true,
         actionColumn: {
-          width: 80,
+          width: 120,
           title: '操作',
           dataIndex: 'action',
           fixed: undefined,
@@ -81,7 +89,7 @@
       }
       //删除表单
      async function handleDelete(record: Recordable) {
-        const result =await delForm({id:record.id})
+        const result =await delForm({ids:[record.id]})
         if(result){
           reload();
         }
@@ -110,11 +118,15 @@
             return color
           }
       }
+      //查看表单数据
+      function handleView(record: Recordable){
+        go('/form/formdata/' + record.id);
+      }
       return {
         registerModal,
         registerTable,
         handleCreate,
-        handleEdit,
+        handleEdit,handleView,
         handleDelete,
         statusFont,
         handleSuccess,

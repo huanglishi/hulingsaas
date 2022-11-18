@@ -55,7 +55,7 @@
                         <div class="img_raw" v-else-if="iten.type==2" >
                           <div class="img_preview videobox">
                             <img :src="ReplaceUrl(iten.cover_url)" class="img_item"/>
-                            <Icon class="folder_video" color="#ffffff" :animation="200"  icon="ion:videocam" :size="24" ></Icon>
+                            <Icon class="folder_video" color="#ffffff" :animation="200"  icon="ic:twotone-slow-motion-video" :size="24" ></Icon>
                           </div>
                         </div>
                         <!--文件夹-->

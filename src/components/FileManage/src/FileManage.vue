@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerfmModal" title="选择附件" des="(只能添加jpg,jpeg,bmp,png,gif, 大小不超过1MB。)" @ok="handleSubmit" width="950px" minHeight="540">
+  <BasicModal v-bind="$attrs" @register="registerfmModal" :title="modaltitle" :des="modaldes" @ok="handleSubmit" width="950px" minHeight="540">
      <div class="addFormbox" style="min-height:540px">
       <div class="tabs-header">
         <div class="tabs-nav-wrap">
@@ -44,11 +44,18 @@
                 <div class="file_list_box">
                   <div class="file_item" v-for="iten in myFileList">
                     <div>
-                      <div :class="{imgbox:iten.type==0,folderbox:iten.type==1}" @click="onSelectImg(iten,1)">
+                      <div :class="{imgbox:iten.type==0||iten.type==2,folderbox:iten.type==1}" @click="onSelectImg(iten,1)">
                         <!--图片-->
                         <div class="img_raw" v-if="iten.type==0" >
                           <div class="img_preview">
                             <img :src="ReplaceUrl(iten.url)" class="img_item"/>
+                          </div>
+                        </div>
+                        <!--视频-->
+                        <div class="img_raw" v-else-if="iten.type==2" >
+                          <div class="img_preview videobox">
+                            <img :src="ReplaceUrl(iten.cover_url)" class="img_item"/>
+                            <Icon class="folder_video" color="#ffffff" :animation="200"  icon="ion:videocam" :size="24" ></Icon>
                           </div>
                         </div>
                         <!--文件夹-->
@@ -59,8 +66,8 @@
                          >
                           <Icon class="folder_preview"  :forceFallback="true"  :animation="200"  icon="fluent-emoji-flat:file-folder" :size="84" ></Icon>
                         </div>
-                        <div class="edit_layer " :class="{l_active:selectList.indexOf(`my_${iten.id}`)>-1}" :draggable="iten.type==0" @dragstart="drag($event,iten.id)">
-                          <i class="colse" @click="onDel(iten.id)"></i>
+                        <div class="edit_layer " :class="{l_active:selectList.indexOf(`my_${iten.id}`)>-1}" :draggable="iten.type==0||iten.type==2" @dragstart="drag($event,iten.id)">
+                          <i class="colse" @click="onDel($event,iten.id)"></i>
                           <i class="choose" ></i>
                         </div>
                       </div>
@@ -193,8 +200,8 @@
         typeid:0,//素材图/插图
         pid:0,//当前层级id 0=父级
         upLoading:false,//上传文件
-        upaccept:'image/*',
-        selectdata:{getnumber:"one",exdata:"" },//选返回值
+        upaccept:"image/*",
+        selectdata:{getnumber:"one",exdata:"",filetype:"image" },//选返回值
         selectList:arraynct,//选择
         dirmenu:[],//我的文件目录菜单
         //图库
@@ -204,16 +211,46 @@
         //分页
         pagenum:1,
         pagetotall:0,
+        //允许上传文件大小
+        fileMaxSize:1,//1M
+        //窗口
+        modaltitle:"选择图片",
+        modaldes:"(只能添加jpg,jpeg,bmp,png,gif, 大小不超过1MB。)",//备注
+        tapList:[
+          {id:1,name:"我的文件"},
+          {id:2,name:"图片库"},
+        ],
       })
       const {
-        fileMaxSize,
+        MaxSizeImage,MaxSizeVideo
       } = window["globalConfig"];
+      //打开弹框
       const [registerfmModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
         // console.log("打开附件选择：",data)
         pagedata.selectList=[]
         pagedata.pid=0
-        pagedata.selectdata.getnumber=data.getnumber
+        pagedata.selectdata.getnumber=data?.getnumber|| "one"//获取多张还是单张-默认单张
+        pagedata.selectdata.filetype=data?.filetype|| "image" //获取附件类型-默认图片
         pagedata.selectdata.exdata=data
+        //允许上传大小
+        if(pagedata.selectdata.filetype=="video"){
+          pagedata.fileMaxSize=MaxSizeVideo
+          pagedata.modaltitle="选择视频"
+          pagedata.upaccept="video/*"
+          pagedata.modaldes=`(只能添加mp4, 大小不超过${MaxSizeVideo}MB。)`
+          pagedata. tapList=[
+            {id:1,name:"我的文件"},
+          ]
+        }else{
+          pagedata.fileMaxSize=MaxSizeImage
+          pagedata.modaltitle="选择图片"
+          pagedata.upaccept="image/*"
+          pagedata.modaldes=`(只能添加jpg,jpeg,bmp,png,gif, 大小不超过${MaxSizeImage}MB。)`
+          pagedata. tapList=[
+            {id:1,name:"我的文件"},
+            {id:2,name:"图片库"},
+          ]
+        }
          getMyfile("")
       });
    
@@ -229,7 +266,7 @@
       //获取-我的文件
       async function getMyfile(searchword:any) {
         loadingRef.value = true;
-        const getdbdata = await getFiles({searchword:searchword,pid:pagedata.pid});
+        const getdbdata = await getFiles({searchword:searchword,pid:pagedata.pid,filetype:pagedata.selectdata.filetype});
         if(getdbdata){
           pagedata.myFileList=getdbdata.items
           if(getdbdata.dirmenu.length>0){
@@ -254,15 +291,15 @@
       //上传附件
       async function beforeUpload(file) {
           // 设置最大值，则判断
-          if (fileMaxSize && file.size / 1024 / 1024 >= fileMaxSize) {
-            createMessage.error(`上传文件大小不能超出${fileMaxSize}M`);
+          if (pagedata.fileMaxSize && file.size / 1024 / 1024 >= pagedata.fileMaxSize) {
+            createMessage.error(`上传文件大小不能超出${pagedata.fileMaxSize}M`);
             return false;
           }
           createMessage.loading({ content: '上传中...', key:"uploadFile",duration:0});
           //开始手动上传
           const filename=file?.name||""
           pagedata.upLoading=true
-          const upres= await uploadFile({ name: 'file', file: file, filename,data:{pid:pagedata.pid}}, (progressEvent) => {
+          const upres= await uploadFile({ name: 'file', file: file, filename,data:{pid:pagedata.pid,filetype:pagedata.selectdata.filetype}}, (progressEvent) => {
                 // 原生获取上传进度的事件
                 if (progressEvent.lengthComputable) {
                   createMessage.loading({ content: '开始上传...', key:"uploadFile",duration:0});
@@ -314,6 +351,17 @@
               pagedata.selectList.push(id_str)
             }
           }
+        }else if(from==1&&item.type==2){
+          var id_str=`my_${item.id}`
+          if(pagedata.selectList.indexOf(id_str)>-1){
+            pagedata.selectList=pagedata.selectList.filter((id)=>id!=id_str)
+          }else{
+            if(pagedata.selectdata.getnumber=="one"){
+              pagedata.selectList=[id_str]
+            }else{
+              pagedata.selectList.push(id_str)
+            }
+          }
         }else if(item.type==1){//是文件夹
           pagedata.pid=item.id
           pagedata.searchword=""
@@ -321,7 +369,9 @@
         }
       }
       //删除附件
-       function onDel(id){
+       function onDel(event,id){
+         //阻止事件冒泡到父元素
+         event.stopPropagation();
         createConfirm({
           iconType: "warning",
           title: '您确定删除吗？',
@@ -472,32 +522,52 @@
         }
       }
       //最后选择图片
+      interface VideoItem {
+        url: string;
+        cover_url: string;
+      }
       function handleSubmit() {
           try {
             if(pagedata.selectList&&pagedata.selectList.length>0){
               const img_list: string[] = [] // 定义字符串数组
+              const video_list: VideoItem[] = [] // 定义字符串数组
               pagedata.selectList.forEach((item)=>{
                 const id_arr=item.split("_")
-                if(id_arr[0]=="my"){//去我的附件找
-                 const myfile= pagedata.myFileList.find((data)=>data.id==parseInt(id_arr[1]))
-                 if(myfile){
-                  img_list.push(myfile.url)
-                 }
-                }else if(id_arr[0]=="mt"){//去图库找
-                  const pic= pagedata.picture.find((data)=>data.id==parseInt(id_arr[1]))
-                 if(pic){
-                  img_list.push(pic.url)
-                 }
+                if(pagedata.selectdata.filetype=="image"){
+                  if(id_arr[0]=="my"){//去我的附件找
+                    const myfile= pagedata.myFileList.find((data)=>data.id==parseInt(id_arr[1]))
+                    if(myfile){
+                      img_list.push(myfile.url)
+                    }
+                  }else if(id_arr[0]=="mt"){//去图库找
+                    const pic= pagedata.picture.find((data)=>data.id==parseInt(id_arr[1]))
+                  if(pic){
+                    img_list.push(pic.url)
+                  }
+                  }
+                }else{
+                    const myfile= pagedata.myFileList.find((data)=>data.id==parseInt(id_arr[1]))
+                    if(myfile){
+                      video_list.push({"url":myfile.url,"cover_url":myfile.cover_url})
+                    }
                 }
               })
-              if(pagedata.selectdata.getnumber=="one"){
-                emit('success', {type:pagedata.selectdata.getnumber,url:img_list[0],list:[],data:pagedata.selectdata.exdata});
-              }else{
-                emit('success', {type:pagedata.selectdata.getnumber,url:"",list:img_list,data:pagedata.selectdata.exdata});
+              if(pagedata.selectdata.filetype=="image"){
+                if(pagedata.selectdata.getnumber=="one"){
+                  emit('success', {type:pagedata.selectdata.getnumber,url:img_list[0],list:[],data:pagedata.selectdata.exdata});
+                }else{
+                  emit('success', {type:pagedata.selectdata.getnumber,url:"",list:img_list,data:pagedata.selectdata.exdata});
+                }
+              }else{//视频
+                if(pagedata.selectdata.getnumber=="one"){
+                  emit('success', {type:pagedata.selectdata.getnumber,...video_list[0],list:[],data:pagedata.selectdata.exdata});
+                }else{
+                  emit('success', {type:pagedata.selectdata.getnumber,url:"",cover_url:"",list:video_list,data:pagedata.selectdata.exdata});
+                }
               }
               closeModal()
             }else{
-              createMessage.error("请选择图片");
+              createMessage.error(pagedata.selectdata.filetype=="image"?"请选择图片":"请选择视频");
             }
           } finally {
             setModalProps({ confirmLoading: false });
@@ -505,10 +575,6 @@
         }
       return { 
         ...toRefs(pagedata),
-        tapList:[
-          {id:1,name:"我的文件"},
-          {id:2,name:"图片库"},
-        ],
         onselectBar,
         registerfmModal,closeModal,
         ReplaceUrl,handleSubmit,onChangFile,
@@ -653,7 +719,15 @@
                       vertical-align: middle;
                     }
                   }
-
+                      //视频
+                    .videobox{
+                      position: relative;
+                      .folder_video{
+                        position: absolute;
+                        top: 15px;
+                        left: 28px;
+                      }
+                    }
                 }
                 .edit_layer{
                   display: none;

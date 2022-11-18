@@ -214,7 +214,7 @@
       });
       //获取表单项数据
       async function onGetFormItem(){
-        const fdata = await getItemList({form_id: pagedata.formData.id});
+          const fdata = await getItemList({form_id: pagedata.formData.id});
           if(fdata){
             pagedata.formData.formItem=fdata
           }

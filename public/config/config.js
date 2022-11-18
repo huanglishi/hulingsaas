@@ -1,6 +1,7 @@
 window.globalConfig = {
 	startYear:2021,
-	fileMaxSize:2,
+	MaxSizeImage:1,
+	MaxSizeVideo:150,
 	copyright:"互领科技",
 	companyWeb:"//www.hulingkeji.com",
 	//项目名称

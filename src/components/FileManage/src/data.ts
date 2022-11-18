@@ -5,7 +5,7 @@ export interface FileItem {
   title: string;
   url: string;
   storage: string;
-  ucover_urlrl: string;
+  cover_url: string;
 }
 export interface CateItem {
   id:number;

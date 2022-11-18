@@ -21,6 +21,7 @@
                       <Radio :value="1">站外连接</Radio>
                     </RadioGroup>
                   </FormItem>
+                  <div ><a @click="handleFileManage_video">视频</a></div>
                   <FormItem label="标题" name="title" :rules="[{ required: true }]">
                     <a-input v-model:value="formData.title" placeholder="填写标题" style="width: 410px;"/>
                   </FormItem>
@@ -263,14 +264,26 @@
       //打开附件选择器
       function handleFileManage() {
         openFileManage(true, {
+          filetype:"image",
           getnumber: "one",
         });
       }
-      //选择图片返回
+      //打开附件选择器
+      function handleFileManage_video() {
+        openFileManage(true, {
+          filetype:"video",
+          getnumber: "one",
+        });
+      }
+      //选择附件返回
       function selectImg(item){
+        if(item.data.filetype=="video"){
+          console.log("选择视频返回",item)
+        }else{
           if(item.type=="one"){
             pagedata.formData.image=item.url
           }
+        }
       }
       //图片预览
       function previewImg(img){
@@ -303,7 +316,7 @@
         dayjs,formRef,
         onFinishFailed,
         //附件
-        registerFileManage,handleFileManage,selectImg,
+        registerFileManage,handleFileManage,selectImg,handleFileManage_video,
         //图片预览
         previewImg,
         //分组

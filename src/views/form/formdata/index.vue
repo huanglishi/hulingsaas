@@ -15,103 +15,138 @@
               ref="select"
               v-model:value="searchkeyword.type"
               style="width: 120px"
+              allowClear
             >
               <a-select-option value="itemvalue">表单项内容</a-select-option>
               <a-select-option value="user">会员账号</a-select-option>
             </a-select>
           </div>
           <div class="searchItem">
-            <a-input v-model:value="searchkeyword.keyword" placeholder="请输入" style="width: 120px;"/>
+            <a-input v-model:value="searchkeyword.keyword" placeholder="请输入" style="width: 150px;" allowClear/>
+          </div>
+          <div class="searchItem">
+            <a-range-picker @change="pickerDate"> </a-range-picker>
+          </div>
+          <div class="searchItem">
+            <a-button type="primary" style="margin-right: 3px;" @click="handelSearch">查找</a-button>
+            <a-button @click="()=>{searchkeyword={type:'itemvalue',keyword:'',date_start:'',date_end:''}}">重置</a-button>
           </div>
          </div>
       </template>
       <template #toolbar>
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'status'"  >
-          <a-tag :color="statusFont(record.status,'color')">
-              <template #icon>
-                <Icon :about="statusFont(record.status,'icon')"></Icon>
-              </template>
-              {{statusFont(record.status,'text')}}
-          </a-tag>
-        </template>
         <template v-if="column.key === 'action'"  >
+          <TableAction
+            :actions="[
+              {
+                icon: 'clarity:note-edit-line',
+                tooltip: '编辑表单',
+                onClick: handleEdit.bind(null, record),
+              },
+              {
+                icon: 'ant-design:delete-outlined',
+                color: 'error',
+                popConfirm: {
+                  title: '是否确认删除',
+                  placement: 'left',
+                  confirm: handleDelete.bind(null, record),
+                },
+              },
+            ]"
+          />
         </template>
       </template>
     </BasicTable>
   </div>
 </template>
 <script lang="ts">
-  import { defineComponent,ref } from 'vue';
-  import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getList } from '/@/api/article/manage';
-  import { columns, searchFormSchema } from './data';
+  import { defineComponent,ref,onMounted,unref,nextTick} from 'vue';
+  import { BasicTable, useTable, TableAction,BasicColumn} from '/@/components/Table';
   import { Icon } from '/@/components/Icon';
-  import { Popconfirm,Select} from 'ant-design-vue';
+  import { Popconfirm,Select,RangePicker} from 'ant-design-vue';
   import { useGo } from '/@/hooks/web/usePage';
+  import { useRoute } from 'vue-router';
+  //api
+  import { getFormField,getFormDataList,delData } from '/@/api/form/data';
   export default defineComponent({
     name: 'formdata',
     components: { 
       BasicTable, TableAction, Icon,[Popconfirm.name]:Popconfirm,
-      ASelect:Select,ASelectOption:Select.Option,
+      ASelect:Select,ASelectOption:Select.Option,ARangePicker:RangePicker,
     },
     setup() {
       const bartitle=ref("表单数据")
+      const go = useGo();
+      //获取传参id
+      const route = useRoute();
+      const formId = ref(route.params?.id);
       const searchkeyword=ref({
          type:"itemvalue",
          keyword:"",
+         date_start:"",
+         date_end:"",
       })
-
-      const go = useGo();
-      const [registerTable, { reload }] = useTable({
-        api: getList,
+      //页面数据
+      const form_columns: BasicColumn[] = [] // 定义表单字段
+      const searchInfo_arr=ref({form_id:unref(formId)})
+      const [registerTable, { reload,setColumns }] = useTable({
+        api: getFormDataList,
         rowKey: 'id',
-        columns,
-        formConfig: {
-          labelWidth: 120,
-          schemas: searchFormSchema,
-        },
+        columns:form_columns,
         useSearchForm: false,
         showTableSetting: true,
         bordered: true,
-        showIndexColumn: true,
+        showIndexColumn: false,//隐藏序号
+        searchInfo:searchInfo_arr,
         actionColumn: {
           width: 80,
           title: '操作',
           dataIndex: 'action',
-          // slots: { customRender: 'action' },
-          fixed: undefined,
+          // fixed: undefined,
         },
       });
       //返回
       function goBack() {
         go('/form/formManage');
       }
-
+      //编辑
       function handleEdit(record: Recordable) {
         console.log(record)
       }
-
-      function handleDelete(record: Recordable) {
-        console.log(record);
-        reload()
+      //删除
+      async function handleDelete(record: Recordable) {
+        const result =await delData({ids:[record.id]})
+        if(result){
+          reload();
+        }
       }
-      //状态
-      function statusFont(status,type) {
-        let text="",icon="",color="";
-          if(status==0){
-
-          }else if(status==1){
-
+      //选择日期
+      function pickerDate(_,dateString){
+       if(dateString){
+        searchkeyword.value.date_start=dateString[0]
+        searchkeyword.value.date_end=dateString[1]
+       }
+      }
+      //获取页面标表头
+      async function getPageField(){
+        var fdata = await getFormField({form_id: unref(formId)});
+          if(fdata){
+            const  parnt_columns: BasicColumn[] = [{dataIndex: 'createtime', title: '提交时间',width: 110}] // 定义表单字段
+            setColumns(parnt_columns.concat(fdata.list))
+            bartitle.value=fdata.title
           }
-          if(type=="text"){
-            return text
-          }else if(type=="icon"){
-            return icon
-          }else if(type=="color"){
-            return color
-          }
+      }
+      //页面初始化
+      onMounted(() => {
+        getPageField();
+      });
+      //搜索
+      function handelSearch(){
+        searchInfo_arr.value={form_id: unref(formId),...unref(searchkeyword)}
+        nextTick(()=>{
+          reload();
+        })
       }
       return {
         searchkeyword,
@@ -119,8 +154,8 @@
         registerTable,
         handleEdit,
         handleDelete,
-        statusFont,
-        goBack,
+        goBack,pickerDate,
+        handelSearch,
       };
     },
   });

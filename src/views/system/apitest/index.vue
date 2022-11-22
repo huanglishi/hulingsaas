@@ -330,6 +330,8 @@
             title: title+'备注',
             content:  h("pre", props, des),
           });
+          }else if(title){
+            createMessage.warning('接口没有备注！');
           }else{
             createMessage.warning('请选择接口！');
           }

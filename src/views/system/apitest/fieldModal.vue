@@ -12,17 +12,17 @@
               <thead>
                 <tr>
                   <th class="hcenter">字段说明</th>
-                  <th class="hcenter">字段名称</th>
-                  <th class="hcenter" style="width:110px;">字段长度</th>
-                  <th class="hcenter">字段类型</th>
+                  <th class="hcenter" style="width:120px;">字段名称</th>
+                  <th class="hcenter" style="width:130px;">字段长度</th>
+                  <th class="hcenter" style="width:120px;">字段类型</th>
                 </tr>
               </thead>
               <tbody class="table-tbody">
                 <template v-for="item in fieldList">
-                  <tr>
-                    <td class="table-cell ">
+                  <tr :class="{colorline:item['COLUMN_NAME']=='id'}">
+                    <td class="table-cell " >
                       <div class="textbox">
-                        {{item["COLUMN_NAME"]!='id'?item["COLUMN_COMMENT"]:"ID"}}
+                        {{item["COLUMN_NAME"]!='id'?item["COLUMN_COMMENT"]:"ID-表名"+item["tablename"] }}
                       </div>
                     </td>
                     <td class="table-cell">
@@ -58,7 +58,6 @@
          if(data){
           fieldList.value=data
          }
-        console.log(data)
       });
       return {
         fieldregister,
@@ -130,6 +129,9 @@
           padding: 10px 5px;
           border-bottom: 1px solid #f0f0f0;
         }
+      }
+      .colorline{
+        background-color: #e6f7ff;
       }
       .alleft{
         text-align: left;

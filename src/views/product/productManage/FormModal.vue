@@ -156,6 +156,17 @@
                         />
                      </div>
                   </FormItem>
+                  <FormItem label="标签" name="lid">
+                    <Select
+                      v-model:value="formData.lid"
+                      :options="labellist"
+                      mode="tags"
+                      placeholder="选择产品标签"
+                      style="width: 410px"
+                      :fieldNames="{label:'name', value: 'id'}"
+                      allowClear
+                    ></Select>
+                  </FormItem>
                   <FormItem label="产品简介" name="des">
                     <a-textarea v-model:value="formData.des" placeholder="填写产品简介" :rows="4" show-count :maxlength="255" allow-clear style="width: 410px;"/>
                   </FormItem>
@@ -187,6 +198,7 @@
   import { getFormCateList } from '/@/api/product/cate';
   import { saveProduct ,getProduct} from '/@/api/product/manage';
   import { getList } from '/@/api/product/pro';
+  import { getFormLabelList } from '/@/api/product/label';
   //组件
   import { Tabs,TabPane,Form,FormItem,RadioGroup,Radio,DatePicker,Select,FormInstance,Row,Col,AutoComplete} from 'ant-design-vue';
   import { ReplaceUrl } from '/@/utils/imgurl';
@@ -220,6 +232,7 @@
       const initform={
         type:0,
         cid:[],
+        lid:[],
         title:"",
         des:"",
         content:"",
@@ -237,6 +250,7 @@
         cateList:[],
         prolist:pro_item,//参数列表
         showpro:true,//是否显示参数
+        labellist:[],//标签
       })
       const {createMessage,} = useMessage();
       //上传附件
@@ -372,6 +386,16 @@
          const prolist = await getList({from:"product",product_id:rowId.value});
         if(prolist){
           pagedata.prolist=prolist
+        }
+        nextTick(()=>{
+          getLabel()
+        })
+      }
+      //标签数据
+      async function getLabel(){
+         const label = await getFormLabelList({});
+        if(label){
+          pagedata.labellist=label
         }
       }
       function handelOpenPro(){

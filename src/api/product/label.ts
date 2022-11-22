@@ -5,16 +5,21 @@
 
  enum Api {
     GetList = '/product/label/getList',
+    GetFormLabelList = '/product/label/getFormLabelList',
     SaveLabel = '/product/label/saveLabel',
     DelLabel = '/product/label/delLabel',
     UpStatus = '/product/label/upStatus',
  }
  
  
- //1.获取列表
- export const getList = (params) => {
-   return defHttp.get({ url: Api.GetList,params:params });
- };
+//1.获取列表
+export const getList = (params) => {
+  return defHttp.get({ url: Api.GetList,params:params });
+};
+//1.获取表单选择列表
+export const getFormLabelList = (params) => {
+  return defHttp.get({ url: Api.GetFormLabelList,params:params });
+};
 //2.保存
 export const saveLabel = (params?: object) =>
 defHttp.post({ url: Api.SaveLabel, params:params}, { errorMessageMode: 'message' });

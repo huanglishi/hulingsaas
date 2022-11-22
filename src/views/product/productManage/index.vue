@@ -6,7 +6,10 @@
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'catename'"  >
-          <a-tag  v-for="item in record.catename">{{item}}</a-tag>
+          <a-tag  v-for="item in record.catename" color="processing" style="margin-right: 2px;">{{item}}</a-tag>
+        </template>
+        <template v-if="column.key === 'labelname'"  >
+          <a-tag  v-for="item in record.labelname" color="success" style="margin-right: 2px;">{{item}}</a-tag>
         </template>
         <template v-if="column.key === 'status'"  >
         </template>

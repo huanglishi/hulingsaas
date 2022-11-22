@@ -11,21 +11,13 @@ export const columns: BasicColumn[] = [
     dataIndex: 'title',
   },
   {
-    title: '分类名称',
+    title: '归属分类',
     dataIndex: 'catename',
   },
-  // {
-  //   title: '文章形式',
-  //   dataIndex: 'type',
-  //   width: 80,
-  //   customRender: ({ record }) => {
-  //     let text="站内文章"
-  //      if( record.type==1){
-  //       text="站外文章"
-  //      }
-  //     return text;
-  //   },
-  // },
+  {
+    title: '标签',
+    dataIndex: 'labelname',
+  },
   {
     title: '价格',
     dataIndex: 'author',

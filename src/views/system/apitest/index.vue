@@ -41,7 +41,7 @@
         <hr class="my-2" />
         <div class="Tablebox">
           <!--表单-->
-          <BasicTable @register="registerTable" >
+          <BasicTable @register="registerTable" @rowClick="rowclickTable">
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'name'"  >
                   <div v-html="record.name_txt"></div>
@@ -348,8 +348,12 @@
             createMessage.warning('请选择接口！');
           }
         }
+        //点击行
+        function rowclickTable(record:Recordable){
+          handleSelect(record)
+        }
       return {
-        formatToDateTime,reflash,
+        formatToDateTime,reflash,rowclickTable,
         ...toRefs(pagedata),
         getTagColor,
         handelRequest,copyURL,showDes,showField,

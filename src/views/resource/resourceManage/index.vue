@@ -46,7 +46,7 @@
          </div>
          <div class="filecontext">
             <div class="filePreview">
-              <div class="file_list_box">
+              <div class="file_list_box" v-loading="loading" loading-tip="加载中...">
                   <div class="file_item" v-for="item in picture" >
                     <div   >
                       <div class="imgbox" @click="onSelectImg(item)">
@@ -72,6 +72,9 @@
                       </div>
                     </div>
                   </div>
+                  <div class="empty" v-if="!loading&&(!picture||picture.length==0)">
+                    <div><Empty description="暂无附件，请上传！"/></div>
+                  </div>
                 </div>
             </div>
          </div>
@@ -86,10 +89,10 @@
   </div>
 </template>
 <script lang="ts">
-  import { defineComponent ,reactive,toRefs,onMounted,ref} from 'vue';
+  import { defineComponent ,reactive,toRefs,onMounted,ref, nextTick} from 'vue';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { Icon } from '/@/components/Icon';
-  import { Progress,Checkbox,Pagination} from 'ant-design-vue';
+  import { Progress,Checkbox,Pagination,Empty} from 'ant-design-vue';
   import { useModal } from '/@/components/Modal';
   import { FileManage } from '/@/components/FileManage';
   //API
@@ -98,7 +101,7 @@
   import {  PictureItem} from './data';
   export default defineComponent({
     name: 'resourceCate',
-    components: { Icon,Progress,ACheckbox:Checkbox,Pagination,FileManage},
+    components: { Icon,Progress,ACheckbox:Checkbox,Pagination,FileManage,Empty},
     setup() {
       //上传附件
       const [registerFileManage, { openModal:  openFileManage }] = useModal();
@@ -117,6 +120,7 @@
         allsize:0,
         searchword:"",
         fileSize:0,
+        loading:false,
       })
       //组件加载完成执行
       onMounted(() => {
@@ -124,6 +128,7 @@
       });
       //获取我的图片
       async function getpicture(searchword:any){
+            pagedata.loading=true
             const getdbdata = await getPicture({searchword:searchword,page:pagedata.page});
               if(getdbdata){
                 pagedata.picture=getdbdata.items
@@ -137,6 +142,9 @@
                 }
                 pagedata.fileSize=(getdbdata.fileSize*(Math.pow(1024, 3)))
               }
+              nextTick(()=>{
+                pagedata.loading=false
+              })
         }
         //选择图片
         function onSelectImg(item){
@@ -333,6 +341,7 @@
             padding: 0;
             margin: 0;
             overflow: hidden;
+            min-height: 500px;
             .file_item{
               float: left;
               width: 100px;
@@ -455,6 +464,13 @@
                 }
               }
             }
+            //内容空
+            .empty{
+              min-height: 500px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
           }
         }
       }
@@ -465,5 +481,6 @@
     }
   }
 }
+
 </style>
   

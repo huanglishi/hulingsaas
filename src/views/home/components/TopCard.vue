@@ -18,8 +18,14 @@
           </div>
           <div class="site_info_warppe">
               <div class="site_name">
-                <div class="title">网站名称</div>
-                <div class="btn"><Icon icon="line-md:edit-twotone" :size="18"></Icon></div>
+                <div class="inputbox" v-if="isedit">
+                  <a-input v-model:value="micwe.title" placeholder="填写网站名称" style="width: 100%;"/>
+                </div>
+                <div class="title" v-else>{{micwe?.title}}</div>
+                <div class="btn">
+                  <Icon icon="line-md:edit-twotone" :size="18" @click="isedit=!isedit" v-if="!isedit"></Icon>
+                  <a-button v-else @click="saveMicwe">提交</a-button>
+                </div>
               </div>
               <!-- <div class="domain_link">
                 <a :href="viewUrl(1)" target="_blank">{{viewUrl(1)}}</a>
@@ -27,7 +33,7 @@
               <div class="site_qrcode_box">
                   <div class="qrcode_img">
                     <QrCode
-                        :value="viewUrl(1)"
+                        :value="viewUrl(micwe?.id)"
                         tag="img"
                         ref="qrRef"
                         class="preview_code"
@@ -49,6 +55,18 @@
                          <div class="text">复制</div>
                        </div>
                     </div>
+                  </div>
+                  <div class="statusbox">
+                     <div class="status_text">
+                        <span>发布：</span>
+                        <Tag :color="getStatusFont(micwe.status,'color')">{{getStatusFont(micwe.status,'text')}}</Tag>
+                     </div>
+                     <div  class="status_publish" v-if="micwe.status==0">
+                      <a-button @click="saveMicwe"  type="primary">立即发布</a-button>
+                     </div>
+                     <div  class="status_erro" v-if="micwe.status==3">
+                         {{micwe.approval_err}}
+                     </div>
                   </div>
               </div>
           </div>
@@ -94,9 +112,10 @@
   </div>
 </template>
 <script lang="ts" setup>
-  // import { GrowCardItem } from './data';
-  // //api
-  // import { getModels } from '/@/api/home/models';
+  import { Tag } from 'ant-design-vue';
+  import { MicwebItem } from './data';
+ //api
+  import { getMicweb ,saveMicweb} from '/@/api/home/base';
   // //组件
   import { ref,unref } from 'vue';
   import { QrCode , QrCodeActionType} from '/@/components/Qrcode/index';
@@ -108,19 +127,57 @@
   import { useUserStore } from '/@/store/modules/user';
   import { encodeURLS } from '/@/utils/imgurl';
   import { useMessage } from '/@/hooks/web/useMessage';
-  const router = useRouter();
-  const userStore = useUserStore();
-  const tplpreviewurl = ref(userStore.getUserInfo?.tplpreviewurl || '');
-  const { clipboardRef, copiedRef } = useCopyToClipboard(); //复制
-  // const datalist = ref<GrowCardItem[]>([]);
-  // const gatlist  =async ()=>{
-  //   datalist.value=await getModels({}) 
-  // }
-  // gatlist()
   //提示弹框
   const {
     createMessage,
    } = useMessage();
+  const router = useRouter();
+  const userStore = useUserStore();
+  const tplpreviewurl = ref(userStore.getUserInfo?.tplpreviewurl || '');
+  const { clipboardRef, copiedRef } = useCopyToClipboard(); //复制
+  //获取微站信息
+  const isedit=ref(false)
+  const micwe = ref<MicwebItem>({id:0,title:'',status:0,approval_err:""});
+  const gatlist  =async ()=>{
+    micwe.value=await getMicweb({}) 
+  }
+  gatlist()
+  //保存微站信息
+  const saveMicwe=async() =>{
+    try {
+        createMessage.loading({ content: '提交中...', key:"saveMicweb",duration:0});
+        const resulfdata=await saveMicweb(unref(micwe)) 
+        isedit.value=false
+        if(resulfdata){
+          createMessage.success({ content: '提交成功！', key:"saveMicweb", duration: 2 });
+        }else{
+          createMessage.destroy("saveMicweb");
+        }
+      } catch {
+        createMessage.destroy("saveMicweb");
+      }
+  }
+  const getStatusFont=(status,type)=>{
+    let text="---",color="default"
+    if(status==0){
+      text= "未发布"
+      color="default"
+    }else if(status==1){
+      text= "审核中"
+      color="processing"
+    }else if(status==2){
+      text= "已发布"
+      color="success"
+    }else if(status==3){
+      text= "审批失败"
+      color="error"
+    }
+    if(type=="text"){
+      return text
+    }else if(type=="color"){
+      return color
+    }
+  }
   function openTapWin(path){
     let routeUrl = router.resolve({
      path: `/${path}`,
@@ -229,10 +286,14 @@
           max-width: 380px;
           min-width: 200px;
             .site_name{
-                max-width: 180px;
+                // max-width: 180px;
                 font-size: 20px;
                 display: flex;
                 margin-bottom: 10px;
+                .inputbox{
+                  flex: 1;
+                  padding-right: 10px;
+                }
                .title{
                 margin-right: 5px;
                 max-width: calc(100% - 55px);
@@ -286,6 +347,20 @@
                       justify-content: center;
                     }
                   }
+                }
+                padding-right: 15px;
+                border-right: 1px solid #eee;
+              }
+              .statusbox{
+                flex:1;
+                padding: 0px 10px;
+                .status_text{
+                  display: flex;
+                  justify-content: center;
+                }
+                .status_publish{
+                  text-align: center;
+                  margin-top: 30px;
                 }
               }
             }

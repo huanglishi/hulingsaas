@@ -21,3 +21,16 @@ export interface TplItem {
   title: string;
   image: string;
 }
+//文章
+export interface ArticleItem {
+  id:number;
+  title: string;
+  star:number;
+}
+//文章信息
+export interface MicwebItem {
+  id:number;
+  title: string;
+  status:number;
+  approval_err: string;
+}

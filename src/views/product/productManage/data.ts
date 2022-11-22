@@ -18,10 +18,10 @@ export const columns: BasicColumn[] = [
     title: '标签',
     dataIndex: 'labelname',
   },
-  {
-    title: '价格',
-    dataIndex: 'author',
-  },
+  // {
+  //   title: '价格',
+  //   dataIndex: 'author',
+  // },
   {
     title: '上架',
     dataIndex: 'status',

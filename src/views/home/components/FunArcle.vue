@@ -3,8 +3,8 @@
     <div class="title_split">功能、教程</div>
     <div class="arcle__list">
       <div class="arcle_ul">
-        <div class="arcle_li">
-          <div class="text">【样式】自适应文章列表新增轮播多图样式</div>
+        <div class="arcle_li" v-for="list in datalist" :key="list.id">
+          <div class="text">{{list.title}}</div>
           <div class="icons"><Icon icon="line-md:thumbs-up"></Icon></div>
         </div>
       </div>
@@ -13,17 +13,17 @@
   </div>
 </template>
 <script lang="ts" setup>
-  // import { GrowCardItem } from './data';
+  import { ArticleItem } from './data';
   //api
-  // import { getModels } from '/@/api/home/models';
+  import { getArticle } from '/@/api/home/base';
   //组件
-  // import {ref } from 'vue';
+  import {ref } from 'vue';
   import { Icon } from '/@/components/Icon';
-  // const datalist = ref<GrowCardItem[]>([]);
-  // const gatlist  =async ()=>{
-  //   datalist.value=await getModels({}) 
-  // }
-  // gatlist()
+  const datalist = ref<ArticleItem[]>([]);
+  const gatlist  =async ()=>{
+    datalist.value=await getArticle({}) 
+  }
+  gatlist()
   defineProps({
     loading: {
       type: Boolean,
@@ -33,6 +33,7 @@
 <style lang="less" scoped>
   .rcard{
     width: 100%;
+    min-height: 356px;
     background-color: #fff;
     border-radius: 4px;
     .title_split{

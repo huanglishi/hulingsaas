@@ -17,4 +17,5 @@ export interface PictureItem {
   type: number;
   title: string;
   url: string;
+  cover_url: string;
 }

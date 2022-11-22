@@ -37,6 +37,11 @@
              <div class="del">
                 <a-button size="small" :disabled="selectIds.length==0" @click="delAll">删除</a-button>
              </div>
+             <div class="updata">
+                <a-button size="small" @click="UpVideo" style="margin-right: 5px;" preIcon="">上传视频</a-button>
+                <a-button size="small" @click="UpImage" style="margin-right: 5px;">上传图片</a-button>
+                <a-button size="small" @click="refreshData">刷新列表</a-button>
+             </div>
            </div>
          </div>
          <div class="filecontext">
@@ -47,8 +52,12 @@
                       <div class="imgbox" @click="onSelectImg(item)">
                         <!--图片-->
                         <div class="img_raw">
-                          <div class="img_preview">
+                          <div class="img_preview" v-if="item.type==0">
                             <img :src="ReplaceUrl(item.url)" class="img_item"/>
+                          </div>
+                          <div class="img_preview video_preview" v-if="item.type==2">
+                            <img :src="ReplaceUrl(item.cover_url)" class="img_item"/>
+                            <Icon class="folder_video" color="#ffffff" :animation="200"  icon="ic:twotone-slow-motion-video" :size="24" ></Icon>
                           </div>
                         </div>
                         <div class="edit_layer "  :class="{l_active:selectIds.indexOf(item.id)>-1}" >
@@ -71,6 +80,8 @@
       <div class="pagination" v-if="total>=pageSize">
         <Pagination v-model:current="page" v-model:pageSize="pageSize" show-quick-jumper :total="total" @change="onChangePage" />
       </div>
+      <!--附件管理器 -->
+      <FileManage  @register="registerFileManage" @success="selectFile"></FileManage>
     </div>
   </div>
 </template>
@@ -79,14 +90,18 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { Icon } from '/@/components/Icon';
   import { Progress,Checkbox,Pagination} from 'ant-design-vue';
+  import { useModal } from '/@/components/Modal';
+  import { FileManage } from '/@/components/FileManage';
   //API
   import { getPicture,delFile,upFile} from '/@/api/resource/manage';
   import { ReplaceUrl } from '/@/utils/imgurl';
   import {  PictureItem} from './data';
   export default defineComponent({
     name: 'resourceCate',
-    components: { Icon,Progress,ACheckbox:Checkbox,Pagination},
+    components: { Icon,Progress,ACheckbox:Checkbox,Pagination,FileManage},
     setup() {
+      //上传附件
+      const [registerFileManage, { openModal:  openFileManage }] = useModal();
       const {createMessage,createConfirm} = useMessage();
       //定义页面变量
       const pictureitem: PictureItem[] = [] // 定义整数型数组
@@ -214,13 +229,37 @@
             if (size < pow1024(4)) return (size / pow1024(3)).toFixed(2) + ' GB';
             return (size / pow1024(4)).toFixed(2) + ' TB'
         }
-        // 求次幂
-        function pow1024(num) {
-            return Math.pow(1024, num)
-        }
+      // 求次幂
+      function pow1024(num) {
+          return Math.pow(1024, num)
+      }
+      //上传视频
+      function UpVideo(){
+        openFileManage(true, {
+          filetype:"video",
+          getnumber: "one",
+        });
+      }
+      //上传图片
+      function UpImage(){
+        openFileManage(true, {
+          filetype:"image",
+          getnumber: "one",
+        });
+      }
+      //选择附件返回
+      function selectFile(){
+
+      }
+      //刷新数据
+      function refreshData(){
+        getpicture("");
+      }
       return {
         ...toRefs(pagedata),
-        onSelectImg,ReplaceUrl,onDel,
+        //附件
+        UpVideo,UpImage,registerFileManage,selectFile,
+        onSelectImg,ReplaceUrl,onDel,refreshData,
         onChangFile,onUpFile,delAll,isCheckAll,onChangePage,filterSize,
       };
     },
@@ -276,6 +315,9 @@
             
           }
           .del{
+            padding-right: 15px;
+          }
+          .updata{
 
           }
         }
@@ -322,6 +364,15 @@
                       vertical-align: middle;
                     }
                   }
+                   //视频
+                   .video_preview{
+                      position: relative;
+                      .folder_video{
+                        position: absolute;
+                        top: 15px;
+                        left: 28px;
+                      }
+                    }
 
                 }
                 .edit_layer{

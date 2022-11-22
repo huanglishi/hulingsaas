@@ -7,6 +7,11 @@ import { useMessage } from '/@/hooks/web/useMessage';
 import dayjs, {  } from 'dayjs';
 export const columns: BasicColumn[] = [
   {
+    title: 'ID',
+    dataIndex: 'id',
+    width: 55,
+  },
+  {
     title: '文章名称',
     dataIndex: 'title',
   },

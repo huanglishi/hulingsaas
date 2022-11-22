@@ -21,7 +21,7 @@
                       <Radio :value="1">站外连接</Radio>
                     </RadioGroup>
                   </FormItem>
-                  <div ><a @click="handleFileManage_video">视频</a></div>
+                  <!-- <div ><a @click="handleFileManage_video">视频</a></div> -->
                   <FormItem label="标题" name="title" :rules="[{ required: true }]">
                     <a-input v-model:value="formData.title" placeholder="填写标题" style="width: 410px;"/>
                   </FormItem>

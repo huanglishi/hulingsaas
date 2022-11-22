@@ -131,7 +131,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive, computed, toRefs ,ref,nextTick, unref} from 'vue';
+  import { defineComponent, reactive, computed, toRefs ,ref,nextTick, unref,h} from 'vue';
   import { Tag, Input,Select,Modal} from 'ant-design-vue';
   import { PageWrapper } from '/@/components/Page';
   import { formatToDateTime } from '/@/utils/dateUtil';
@@ -325,9 +325,10 @@
         //展示备注
         function showDes(title,des){
           if(des){
+            const props = { style: { color: "red" } };
             Modal.info({
             title: title+'备注',
-            content: des,
+            content:  h("pre", props, des),
           });
           }else{
             createMessage.warning('请选择接口！');

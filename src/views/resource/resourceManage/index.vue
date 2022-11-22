@@ -16,13 +16,13 @@
                  from: '#87d068',
                  to: '#ff4d4f',
               }"
-              :percent="(allsize/fileSize).toFixed(5)"
+              :percent="fileSize>0?(allsize/fileSize).toFixed(5):0"
             />
           </div>
         </div>
         <div class="rt">
-          <span class="all">总量：{{filterSize(fileSize)}}</span>
-          <span class="use">已用：{{filterSize(allsize)}}</span>
+          <span class="all">总量： {{fileSize>0?filterSize(fileSize):0}}</span>
+          <span class="use">已用：{{allsize>0?filterSize(allsize):0}}</span>
         </div>
       </div>
     </div>
@@ -129,9 +129,12 @@
                 pagedata.picture=getdbdata.items
                 pagedata.page=getdbdata.page
                 pagedata.pageSize=getdbdata.pageSize
-                pagedata.total=getdbdata.total
-                pagedata.allnumber=getdbdata.allnumber
-                pagedata.allsize=getdbdata.allsize
+                pagedata.total=getdbdata?.total||0
+                pagedata.allnumber=getdbdata?.allnumber||0
+                pagedata.allsize=getdbdata?.allsize||0
+                if(!getdbdata.fileSize){
+                  getdbdata.fileSize=0
+                }
                 pagedata.fileSize=(getdbdata.fileSize*(Math.pow(1024, 3)))
               }
         }

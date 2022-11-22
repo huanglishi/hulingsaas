@@ -109,7 +109,12 @@
         <hr class="my-2" />
         <div class="flex items-center mb-2">
           <span class=" mr-4"> 请求状态: </span>
-          <Tag :color="getTagColor">{{ requestAfter.laoding }}</Tag>
+          <Tag :color="getTagColor">
+            <template #icon v-if="requestAfter.laoding=='processing'">
+              <sync-outlined :spin="true" />
+            </template>
+            {{ requestAfter.laoding }}
+          </Tag>
         </div>
         <div class="flex items-center mb-2">
           <span class=" mr-4"> 请求结果: </span>
@@ -133,6 +138,9 @@
 <script lang="ts">
   import { defineComponent, reactive, computed, toRefs ,ref,nextTick, unref,h} from 'vue';
   import { Tag, Input,Select,Modal} from 'ant-design-vue';
+  import {
+  SyncOutlined,
+} from '@ant-design/icons-vue';
   import { PageWrapper } from '/@/components/Page';
   import { formatToDateTime } from '/@/utils/dateUtil';
   import { CodeEditor, MODE } from '/@/components/CodeEditor';
@@ -154,7 +162,7 @@
     components: {
       PageWrapper,CodeEditor,BasicTable,TableAction,groupModal,FormModal,fieldModal,
       [Input.name]: Input,
-      InputTextArea: Input.TextArea,
+      InputTextArea: Input.TextArea,SyncOutlined,
       Tag,Icon,
        ASelect:Select,ASelectOption:Select.Option 
     },

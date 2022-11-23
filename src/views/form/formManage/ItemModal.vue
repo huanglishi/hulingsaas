@@ -31,7 +31,7 @@
               <FormItem label="字数限制" v-if="['input','textarea'].indexOf(formData.type)>-1" name="wordlimit" >
                 <a-input v-model:value="formData.wordlimit" placeholder="请输入字数限制" style="width: 410px;"/>
               </FormItem>
-              <FormItem label="选项" v-if="['radio','select'].indexOf(formData.type)>-1" name="option" extra="每行一个选项（换行分隔）">
+              <FormItem label="选项" v-if="['radio','select','checkbox'].indexOf(formData.type)>-1" name="option" extra="每行一个选项（换行分隔）">
                 <a-textarea  v-model:value="formData.option" placeholder="请输入下拉选项值（每行一个选项）" style="width: 410px;" :rows="4"/>
               </FormItem>
               <FormItem label="图片最大数量" v-if="['image'].indexOf(formData.type)>-1" name="number" >

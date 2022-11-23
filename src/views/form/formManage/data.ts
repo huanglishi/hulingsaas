@@ -71,7 +71,7 @@ export interface Form_item {
   weigh: number;
   status: number;
   name: string;
-  value:string;
+  value?:string|any[];
   required:number;
   placeholder:string;//提示
   wordlimit:number;//字数限制

@@ -38,7 +38,7 @@
                               <th class="alcenter" style="width:70px;">显示</th>
                               <th class="alcenter" style="width:70px;">必填</th>
                               <th class="alcenter" style="width:70px;">排序</th>
-                              <th class="alcenter" style="width:90px;">操作</th>
+                              <th class="alcenter" style="width:85px;">操作</th>
                             </tr>
                           </thead>
                           <tbody class="table-tbody">
@@ -59,6 +59,11 @@
                                       <a-radio-group v-model:value="item.value">
                                           <a-radio v-for="optext in optionToArray(item.option)" :value="optext" >{{optext}}</a-radio>
                                         </a-radio-group>
+                                    </div>
+                                    <div class="checkbox" v-else-if="['checkbox'].indexOf(item.type)>-1">
+                                      <CheckboxGroup v-model:value="item.value" >
+                                         <Checkbox v-for="optext in optionToArray(item.option)" :value="optext">{{optext}}</Checkbox>
+                                      </CheckboxGroup>
                                     </div>
                                     <div class="radiobox" v-else-if="['select'].indexOf(item.type)>-1">
                                       <a-select
@@ -158,7 +163,7 @@
   import { upWeigh ,getItemList ,upItem,upRequired,delItem} from '/@/api/form/item';
   import { saveForm } from '/@/api/form/manage';
   //组件
-  import { Tabs,TabPane,Form,FormItem,Radio,DatePicker,Select,FormInstance,Switch} from 'ant-design-vue';
+  import { Tabs,TabPane,Form,FormItem,Radio,DatePicker,Select,FormInstance,Switch,Checkbox} from 'ant-design-vue';
   import { ReplaceUrl } from '/@/utils/imgurl';
   import { Tinymce } from '/@/components/Tinymce/index';
   import {PlusOutlined,PhoneOutlined} from '@ant-design/icons-vue';
@@ -172,7 +177,7 @@
       BasicModal, Tinymce,PlusOutlined,PhoneOutlined,FileManage,Icon,ItemModal,
       // BasicForm,
       Tabs,TabPane,Form,FormItem,ARadio:Radio,ARadioGroup:Radio.Group,DatePicker,ASelect:Select,ASelectOption:Select.Option,Switch,
-      ElScrollbar,
+      ElScrollbar,Checkbox,CheckboxGroup:Checkbox.Group,
     },
     emits: ['success', 'register'],
     setup(_, { emit }) {
@@ -636,6 +641,9 @@
       }
     .table-tbody{
       .table-cell{
+        .checkbox{
+          text-align: left;
+        }
         .textname{
           padding-left: 10px;
         }

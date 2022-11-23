@@ -136,3 +136,17 @@ export const formTypeList = [
     icon: 'ic:outline-email',
   },
 ];
+
+//规则
+export interface RuleItem {
+  id:number;
+  uuid:string;
+  form_id:number;
+  form_item_id?:number|null;
+  selectval:string[];
+  value?:string|any[]|null;
+  show_item_ids:number[];//显示字段id
+  show_item_text:string[];//显示字段文字
+  showadd:boolean,//显示添加按钮
+  isdow:boolean,//是否展开
+}

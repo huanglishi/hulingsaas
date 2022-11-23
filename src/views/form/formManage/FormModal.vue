@@ -23,7 +23,7 @@
                         <div class="left"></div>
                         <div class="right">
                           <a-button @click="handelAddItem">添加表单项</a-button>
-                          <a-button style="margin-left:20px ;">规则设置</a-button>
+                          <a-button style="margin-left:20px;" @click="handelOpenRule" :title="formData.id==0?'请保存表单后再编辑规则':''" :disabled="formData.id==0">规则设置</a-button>
                         </div>
                     </div>
                   </FormItem>
@@ -61,7 +61,7 @@
                                         </a-radio-group>
                                     </div>
                                     <div class="checkbox" v-else-if="['checkbox'].indexOf(item.type)>-1">
-                                      <CheckboxGroup v-model:value="item.value" >
+                                      <CheckboxGroup v-model="item.value" >
                                          <Checkbox v-for="optext in optionToArray(item.option)" :value="optext">{{optext}}</Checkbox>
                                       </CheckboxGroup>
                                     </div>
@@ -149,6 +149,8 @@
       </div>
         <!--表单项-->
         <ItemModal @register="ItemModals"  @success="upItemData"/>
+        <!--表单规则-->
+        <RuleModal @register="RuleModals" />
      </div>
   </BasicModal>
 </template>
@@ -158,6 +160,7 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { Icon } from '/@/components/Icon';
   import ItemModal from './ItemModal.vue';
+  import RuleModal from './RuleModal.vue';
   import { useModal } from '/@/components/Modal';
   //API
   import { upWeigh ,getItemList ,upItem,upRequired,delItem} from '/@/api/form/item';
@@ -174,7 +177,7 @@
   export default defineComponent({
     name: 'FormModal',
     components: { 
-      BasicModal, Tinymce,PlusOutlined,PhoneOutlined,FileManage,Icon,ItemModal,
+      BasicModal, Tinymce,PlusOutlined,PhoneOutlined,FileManage,Icon,ItemModal,RuleModal,
       // BasicForm,
       Tabs,TabPane,Form,FormItem,ARadio:Radio,ARadioGroup:Radio.Group,DatePicker,ASelect:Select,ASelectOption:Select.Option,Switch,
       ElScrollbar,Checkbox,CheckboxGroup:Checkbox.Group,
@@ -184,19 +187,20 @@
       const formRef = ref<FormInstance>();
       const isUpdate = ref(true);
       //表单项
-      const [ItemModals, { openModal: openItem }] = useModal();//编辑表单项
+      const [ItemModals, { openModal: openItem }] = useModal();
+      //编辑表单规则
+      const [RuleModals, { openModal: openRule }] = useModal();
       //表单数据
       const form_item: Form_item[] = [] // 定义表单项自结构
-      const initform={
-        id:0,
-        name:"",
-        des:"",
-        button_text:"提交",
-        success_tig:"数据已提交成功",
-        formItem:form_item
-      }
       const pagedata=reactive({
-        formData:initform,
+        formData:{
+            id:0,
+            name:"",
+            des:"",
+            button_text:"提交",
+            success_tig:"数据已提交成功",
+            formItem:form_item
+          },
         activeKey:1,
       })
       const {createMessage,createConfirm} = useMessage();
@@ -213,7 +217,14 @@
           //获取对用的表单项
           onGetFormItem()
         }else{
-          pagedata.formData= initform
+          pagedata.formData= {
+              id:0,
+              name:"",
+              des:"",
+              button_text:"提交",
+              success_tig:"数据已提交成功",
+              formItem:form_item
+            }
           pagedata.formData.formItem=[]
         }
       });
@@ -295,6 +306,12 @@
             createMessage.destroy("upPro");
           }
       }
+      //添加规则
+      function handelOpenRule(){
+        openRule(true,{
+          form_id: pagedata.formData.id
+        })
+      }
       //添加表单项
       function handelAddItem(){
         openItem(true,{
@@ -365,6 +382,7 @@
         //表单
         handelUpWeigh,handelUpForm,upWeigh,handelUpRequired,
         handelAddItem,upItemData,ItemModals,handelEditItem,handelDelItem,
+        RuleModals,handelOpenRule,
         optionToArray,
        };
     },

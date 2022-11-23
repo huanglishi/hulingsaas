@@ -333,9 +333,9 @@
         //展示备注
         function showDes(title,des){
           if(des){
-            const props = { style: { color: "red" } };
+            const props = { style: { color: "red" ,whiteSpace: "pre-wrap"} };
             Modal.info({
-            title: title+'备注',
+            title: title+'-备注',
             content:  h("pre", props, des),
           });
           }else if(title){

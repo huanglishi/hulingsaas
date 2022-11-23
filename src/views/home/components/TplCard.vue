@@ -70,7 +70,7 @@
   import { getTplGroup , getTpllist } from '/@/api/home/mwebtpl';
   //组件
   import {ref } from 'vue';
-  import SelectTemplate from '/@/views/microweb/webmain/modules/SelectTemplate.vue';
+  import SelectTemplate from '/@/views/microweb/component/SelectTemplate.vue';
   import { Icon } from '/@/components/Icon';
   import { QrCode} from '/@/components/Qrcode/index';
   import { useUserStore } from '/@/store/modules/user';

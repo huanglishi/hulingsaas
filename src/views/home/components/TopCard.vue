@@ -62,7 +62,7 @@
                         <Tag :color="getStatusFont(micwe.status,'color')">{{getStatusFont(micwe.status,'text')}}</Tag>
                      </div>
                      <div  class="status_publish" v-if="micwe.status==0">
-                      <a-button @click="saveMicwe"  type="primary">立即发布</a-button>
+                      <a-button @click="handelPublishMicweb"  type="primary">立即发布</a-button>
                      </div>
                      <div  class="status_erro" v-if="micwe.status==3">
                          {{micwe.approval_err}}
@@ -115,7 +115,7 @@
   import { Tag } from 'ant-design-vue';
   import { MicwebItem } from './data';
  //api
-  import { getMicweb ,saveMicweb} from '/@/api/home/base';
+  import { getMicweb ,saveMicweb,publishMicweb} from '/@/api/home/base';
   // //组件
   import { ref,unref } from 'vue';
   import { QrCode , QrCodeActionType} from '/@/components/Qrcode/index';
@@ -155,6 +155,22 @@
         }
       } catch {
         createMessage.destroy("saveMicweb");
+      }
+  }
+  //发布微站
+  const handelPublishMicweb=async() =>{
+    try {
+        createMessage.loading({ content: '提交发布中...', key:"publishMicweb",duration:0});
+        const resulfdata=await publishMicweb({id:unref(micwe).id}) 
+        isedit.value=false
+        if(resulfdata){
+          micwe.value.status=1
+          createMessage.success({ content: '提交发布成功，请等待审核！', key:"publishMicweb", duration: 2 });
+        }else{
+          createMessage.destroy("publishMicweb");
+        }
+      } catch {
+        createMessage.destroy("publishMicweb");
       }
   }
   const getStatusFont=(status,type)=>{

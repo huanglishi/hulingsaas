@@ -7,6 +7,7 @@
   GetArticle = '/home/base/getArticle',
   GetMicweb = '/home/base/getMicweb',
   SaveMicweb = '/home/base/saveMicweb',
+  PublishMicweb = '/home/base/publishMicweb',
  }
  
  
@@ -18,6 +19,9 @@
  export const getMicweb = (params) => {
    return defHttp.get({ url: Api.GetMicweb,params:params });
  };
- //2.保存
+ //3.编辑
 export const saveMicweb = (params?: object) =>
 defHttp.post({ url: Api.SaveMicweb, params:params}, { errorMessageMode: 'message' });
+ //4.发布
+export const publishMicweb = (params?: object) =>
+defHttp.post({ url: Api.PublishMicweb, params:params}, { errorMessageMode: 'message' });

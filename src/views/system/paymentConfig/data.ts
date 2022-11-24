@@ -1,7 +1,9 @@
 export interface WXpayItem {
   appId:string;//公众账号ID
-  mch_id: string;//商户号
-  mch_key: string;//#API商户密钥
+  mchID: string;//商户号
+  mchAPIv3Key: string;//#商户APIv3密钥
+  mchCertificateSerialNumber: string;//#商户证书序列号
+  privatekey:string;//商户私钥.pem文件
 }
 export interface submitPasswordItem {
   show:boolean;//显示

@@ -22,21 +22,62 @@
                     </a-form-item>
                     <a-form-item
                       label="微信支付商户号"
-                      name="mch_id"
+                      name="mchID"
                       :rules="[{ required: true, message: '请填写微信支付商户平台的商户号' }]"
                     >
-                      <a-input v-model:value="wxpayFome.mch_id" placeholder="写微信支付商户平台的商户号"/>
+                      <a-input v-model:value="wxpayFome.mchID" placeholder="写微信支付商户平台的商户号"/>
                     </a-form-item>
 
                     <a-form-item
-                      label="微信支付商户密钥"
-                      name="mch_key"
-                      :rules="[{ required: true, message: '请填写微信支付商户平台的商户密钥' }]"
+                      label="商户APIv3密钥"
+                      name="mchAPIv3Key"
+                      :rules="[{ required: true, message: '请填写微信支付商户平台的API v3密钥' }]"
                     >
-                      <a-input-password v-model:value="wxpayFome.mch_key" :disabled="wxpay_key" style="width: calc(100% - 70px);" placeholder="填写微信支付商户平台的商户密钥"/>
+                      <a-input-password v-model:value="wxpayFome.mchAPIv3Key" :disabled="wxpay_key" style="width: calc(100% - 70px);" placeholder="填写微信支付商户平台的商户密钥"/>
                       <a class="edit" @click="showKey">查看</a>
+                      <template #help>
+                        <div>
+                          商户需先在【商户平台】->【API安全】的页面设置该密钥，请求才能通过微信支付的签名校验。密钥的长度为32个字节。
+                        <a target="_blank" href="https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay3_2.shtml">了解</a>
+                        <a target="_blank" href="https://kf.qq.com/faq/161222NneAJf161222U7fARv.html" style="margin-left: 5px;">API证书</a>
+                      </div>
+                      </template>
                     </a-form-item>
-
+                    <a-form-item
+                      label="商户证书序列号"
+                      name="mchCertificateSerialNumber"
+                      :rules="[{ required: true, message: '请填写微信支付商户平台的商户证书序列号' }]"
+                    >
+                      <a-input-password v-model:value="wxpayFome.mchCertificateSerialNumber" :disabled="wxpay_key" style="width: calc(100% - 70px);" placeholder="填写微信支付商户平台的商户证书序列号"/>
+                      <a class="edit" @click="showKey">查看</a>
+                      <template #help>
+                        <div>
+                          登陆商户平台【API安全】->【API证书】->【查看证书】，可查看商户API证书序列号。
+                        <a target="_blank" href="https://wechatpay-api.gitbook.io/wechatpay-api-v3/chang-jian-wen-ti/zheng-shu-xiang-guan#ru-he-cha-kan-zheng-shu-xu-lie-hao">了解</a>
+                      </div>
+                      </template>
+                    </a-form-item>
+                    <a-form-item
+                      label="商户私钥"
+                      name="privatekey"
+                      :rules="[{ required: true, message: '请上传微信支付商户平台的商户私钥' }]"
+                      help="请勿更改导致无法正常使用微信支付"
+                    >
+                    <div class="upbox">
+                      <Upload 
+                      :show-upload-list="false" 
+                      accept=".pem"  
+                      :multiple="false" 
+                      :before-upload="beforeUpload" 
+                      >
+                        <div class="pemfile" v-if="wxpayFome.privatekey" title="请勿更改">
+                          <Icon icon="bi:filetype-key" size="32" color="#0960bd"></Icon>
+                          <span>私钥已上传</span>
+                        </div>
+                        <a-button v-else preIcon="bi:filetype-key">上传商户私钥文件</a-button>
+                      </Upload>
+                    </div>
+                    </a-form-item>
                     <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
                       <a-button type="primary" html-type="submit">提交</a-button>
                     </a-form-item>
@@ -66,16 +107,16 @@
   <script lang="ts">
     import { defineComponent ,ref,reactive, unref,onMounted} from 'vue';
     import { Icon } from '/@/components/Icon';
-    import { Tabs,TabPane ,Form,FormItem,Modal} from 'ant-design-vue';
+    import { Tabs,TabPane ,Form,FormItem,Modal,Upload} from 'ant-design-vue';
     import { WXpayItem,submitPasswordItem } from './data';
     import { useMessage } from '/@/hooks/web/useMessage';
     import { useUserStore } from '/@/store/modules/user';
     //API
-    import { getPayIinfo,savePay } from '/@/api/system/payment';
+    import { getPayIinfo,savePay,uploadFile } from '/@/api/system/payment';
     import md5 from 'md5'
     export default defineComponent({
       name: 'paymentConfig',
-      components: { Icon,
+      components: { Icon,Upload,
       [Tabs.name]:Tabs,[TabPane.name]:TabPane,
       [Form.name]:Form,[FormItem.name]:FormItem,
       [Modal.name]:Modal,
@@ -89,8 +130,10 @@
         const wxpay_id=ref(0)
         const wxpayFome = reactive<WXpayItem>({
               appId: '',
-              mch_id: '',
-              mch_key: "",
+              mchID: '',
+              mchAPIv3Key: "",//商户APIv3密钥
+              mchCertificateSerialNumber: "",//商户证书序列号
+              privatekey:"",//商户私钥
           });
           //验证密码
         const submitPassword = reactive<submitPasswordItem>({
@@ -132,8 +175,10 @@
           wxpay_key.value=true
           wxpay_id.value=data.id
           wxpayFome.appId=data.appId
-          wxpayFome.mch_id=data.mch_id
-          wxpayFome.mch_key=data.mch_key
+          wxpayFome.mchID=data.mchID
+          wxpayFome.mchAPIv3Key=data.mchAPIv3Key
+          wxpayFome.mchCertificateSerialNumber=data.mchCertificateSerialNumber
+          wxpayFome.privatekey=data.privatekey
         }
       });
         //打开查看秘钥
@@ -162,8 +207,39 @@
             }
           }
         }
+        //上传私钥
+        const upLoading=ref(false)
+        async function beforeUpload(file){
+          // 设置最大值，则判断
+         var farr=file.name.split(".")
+          if (farr[farr.length-1]!="pem") {
+            createMessage.error(`请上传pem格式文件`);
+            return false;
+          }
+          createMessage.loading({ content: '准备上传...', key:"uploadFile",duration:0});
+          //开始手动上传
+          const filename=file?.name||""
+          upLoading.value=true
+          const upres= await uploadFile({ name: 'file', file: file, filename,data:{}}, (progressEvent) => {
+                // 原生获取上传进度的事件
+                if (progressEvent.lengthComputable) {
+                  createMessage.loading({ content: '开始上传...', key:"uploadFile",duration:0});
+                }
+            })
+          if(upres.status==200&&upres.data){
+            if(upres.data.code==0){
+              wxpayFome.privatekey= upres.data.result.url
+            }
+            createMessage.success({ content: '上传成功！', key:"uploadFile", duration: 2 });
+            upLoading.value=false
+            //更新数据
+          }else{
+            createMessage.destroy("uploadFile");
+          }
+          return false;
+        }
         return {
-          activeKey: ref('wxpay'),
+          activeKey: ref('wxpay'),beforeUpload,
           wxpayFome,wxpay_key,submitPassword,
           onFinish,showKey,handleOkPassword,
           onFinishFailed,
@@ -183,7 +259,7 @@
     border-radius: 2px;
     padding: 10px;
     .formbox{
-      width: 500px;
+      width: 550px;
       .edit{
         height: 100%;
         width: 70px;
@@ -204,6 +280,14 @@
   }
   .text{
     flex:1;
+  }
+ }
+ //上传文件
+ .upbox{
+  margin-top: 2px;
+  .pemfile{
+    color: #0960bd;
+    padding-bottom: 5px;
   }
  }
 </style>

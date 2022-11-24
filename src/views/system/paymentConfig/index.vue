@@ -64,18 +64,24 @@
                       help="请勿更改导致无法正常使用微信支付"
                     >
                     <div class="upbox">
-                      <Upload 
-                      :show-upload-list="false" 
-                      accept=".pem"  
-                      :multiple="false" 
-                      :before-upload="beforeUpload" 
-                      >
-                        <div class="pemfile" v-if="wxpayFome.privatekey" title="请勿更改">
-                          <Icon icon="bi:filetype-key" size="32" color="#0960bd"></Icon>
-                          <span>私钥已上传</span>
-                        </div>
-                        <a-button v-else preIcon="bi:filetype-key">上传商户私钥文件</a-button>
-                      </Upload>
+                      <div class="upbtn">
+                          <Upload 
+                          :show-upload-list="false" 
+                          accept=".pem"  
+                          :multiple="false" 
+                          :before-upload="beforeUpload" 
+                          :disabled="wxpay_key"
+                          >
+                            <div class="pemfile " v-if="wxpayFome.privatekey" title="请勿更改">
+                              <Icon icon="bi:filetype-key" size="32" color="#0960bd"></Icon>
+                              <span>私钥已上传</span>
+                            </div>
+                            <a-button v-else preIcon="bi:filetype-key">上传商户私钥文件</a-button>
+                          </Upload>
+                      </div>
+                      <div class="redit">
+                        <a  @click="showKey">重新上传</a>
+                      </div>
                     </div>
                     </a-form-item>
                     <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
@@ -285,9 +291,20 @@
  //上传文件
  .upbox{
   margin-top: 2px;
-  .pemfile{
+  display: flex;
+  .upbtn{
+    .pemfile{
+      color: #0960bd;
+      padding-bottom: 5px;
+    }
+  }
+  .redit{
     color: #0960bd;
-    padding-bottom: 5px;
+    padding: 10px;
+    padding-left: 50px;
+    height: 100%;
+    text-align: center;
+    user-select: none;
   }
  }
 </style>

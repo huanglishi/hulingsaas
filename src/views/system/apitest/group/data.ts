@@ -57,12 +57,25 @@ export const formSchema: FormSchema[] = [
   {
     field: 'status',
     label: '状态',
-    component: 'RadioButtonGroup',
+    component: 'RadioGroup',
     defaultValue: 0,
     componentProps: {
       options: [
         { label: '启用', value: 0 },
         { label: '停用', value: 1 },
+      ],
+    },
+    required: true,
+  },
+  {
+    field: 'useFrom',
+    label: '调用接口',
+    component: 'RadioGroup',
+    defaultValue: "pc",
+    componentProps: {
+      options: [
+        { label: 'PC端', value: "pc" },
+        { label: '手机端', value: "phone" },
       ],
     },
     required: true,

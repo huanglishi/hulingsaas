@@ -53,6 +53,7 @@
         isUpdate.value = !!data?.isUpdate;
         if (unref(isUpdate)) {
           rowId.value = data.record.id;
+          data.record.pid=data.record.pid+""
           setFieldsValue({
             ...data.record,
           });

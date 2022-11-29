@@ -158,6 +158,8 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useCopyToClipboard } from '/@/hooks/web/useCopyToClipboard';
   import { Icon } from '/@/components/Icon';
+  import axios from 'axios';
+  import md5 from 'md5'
   export default defineComponent({
     components: {
       PageWrapper,CodeEditor,BasicTable,TableAction,groupModal,FormModal,fieldModal,
@@ -178,7 +180,7 @@
         isRequest:false,
         fetching:true,
         //请求参数
-        requestData:{id:0,title:"请选择请求接口",url:"",method:"get",param:'{"title":"示例参数"}',des:"",tablename:""},
+        requestData:{id:0,title:"请选择请求接口",url:"",method:"get",param:'{"title":"示例参数"}',des:"",tablename:"",useFrom:"pc"},
         requestAfter:{step:"none",result:"",laoding:"warning",status:200,message:"",code:0},
       });
 
@@ -219,7 +221,7 @@
       }
     //选择使用
     function handleSelect(record: Recordable) {
-      pagedata.requestData={id:record.id,title:record.title,url:record.url,method:record.method,param:record.param,des:record.des,tablename:record.tablename}
+      pagedata.requestData={id:record.id,title:record.title,url:record.url,method:record.method,param:record.param,des:record.des,tablename:record.tablename,useFrom:record.useFrom}
     }
      //表格
      const searchInfo_arr=ref({})
@@ -266,19 +268,56 @@
           return;
         }
         pagedata.requestAfter.laoding="processing"
-        const gerresult =await  rreqhttp()
-        if(gerresult){
-          pagedata.requestAfter.result=gerresult.data.result
-          pagedata.requestAfter.status=gerresult.status
-          pagedata.requestAfter.message=gerresult.data.message
-          pagedata.requestAfter.code=gerresult.data.code
-          if(gerresult.data.code==0){
-            pagedata.requestAfter.laoding="success"
-          }else{
-            pagedata.requestAfter.laoding="error"
+        if(pagedata.requestData.useFrom=="pc"){
+          const gerresult =await  rreqhttp()
+          if(gerresult){
+            pagedata.requestAfter.result=gerresult.data.result
+            pagedata.requestAfter.status=gerresult.status
+            pagedata.requestAfter.message=gerresult.data.message
+            pagedata.requestAfter.code=gerresult.data.code
+            if(gerresult.data.code==0){
+              pagedata.requestAfter.laoding="success"
+            }else{
+              pagedata.requestAfter.laoding="error"
+            }
+          }
+        }else if(pagedata.requestData.useFrom=="phone"){
+          const gerresults =await otherHttp()
+          console.log("手机请求：",gerresults)
+          if(gerresults){
+            pagedata.requestAfter.result=gerresults["data"].result
+            pagedata.requestAfter.status=gerresults["status"]
+            pagedata.requestAfter.message=gerresults["data"].message
+            pagedata.requestAfter.code=gerresults["data"].code
+            if(gerresults["data"].code==0){
+              pagedata.requestAfter.laoding="success"
+            }else{
+              pagedata.requestAfter.laoding="error"
+            }
           }
         }
+       
       }
+      //手机端接口
+      function otherHttp(){
+        var params={}
+        if(pagedata.requestData.param){
+          params=JSON.parse(pagedata.requestData.param)
+        }
+         //接口验证
+        const { API_SECRET } = window["globalConfig"]; //从config读取的配置-打包后可以修改-变化
+        const timestamp: number = Date.parse(new Date().toString())/1000;
+        if(pagedata.requestData.method=="get"){
+            return axios.get(pagedata.requestData.url, { params: params,headers: {'verify-time': timestamp,"verify-encrypt":md5(API_SECRET+timestamp)} })
+          }else if(pagedata.requestData.method=="post"){
+            return axios.post(pagedata.requestData.url, params,{headers: {'verify-time': timestamp,"verify-encrypt":md5(API_SECRET+timestamp)}});
+          }else if(pagedata.requestData.method=="delete"){
+            return axios.delete(pagedata.requestData.url,params,{headers: {'verify-time': timestamp,"verify-encrypt":md5(API_SECRET+timestamp)}});
+          }else{
+            return false
+          }
+      }
+      //pc端接口
        function rreqhttp(){
         var params={}
         if(pagedata.requestData.param){

@@ -91,7 +91,7 @@
       }
       //删除
      async function handleDelete(record: Recordable) {
-        const result =await delGroup({id:record.id})
+        const result =await delGroup({ids:[record.id]})
         if(result){
           reload();
         }

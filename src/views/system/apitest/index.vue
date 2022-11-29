@@ -259,6 +259,7 @@
       }
       //刷新
       function reflash(){
+        pagedata.requestAfter={step:"none",result:"",laoding:"warning",status:200,message:"",code:0}
         reload();
       }
       //开启请求

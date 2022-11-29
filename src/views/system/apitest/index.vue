@@ -395,7 +395,7 @@
               createMessage.warning({ content: '未获取数据', key:"getDBField", duration: 2 });
             }
           }else{
-            createMessage.warning('请选择接口或未填写数据库');
+            createMessage.warning('请选择接口或未填写数据库!');
           }
         }
         //点击行

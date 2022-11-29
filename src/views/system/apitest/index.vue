@@ -35,7 +35,7 @@
           <div class="group">
             <a-button type="primary" style="margin-right: 3px;" @click="addApitest">添加接口</a-button>
             <a-button @click="openCate" style="margin-right: 3px;">管理分组</a-button>
-            <a-button @click="reflash" shape="circle" preIcon="mdi:sync"></a-button>
+            <a-button @click="reflash" shape="circle" preIcon="mdi:sync" title="刷新"></a-button>
           </div>
         </div>
         <hr class="my-2" />
@@ -283,7 +283,6 @@
           }
         }else if(pagedata.requestData.useFrom=="phone"){
           const gerresults =await otherHttp()
-          console.log("手机请求：",gerresults)
           if(gerresults){
             pagedata.requestAfter.result=gerresults["data"].result
             pagedata.requestAfter.status=gerresults["status"]
@@ -308,11 +307,11 @@
         const { API_SECRET } = window["globalConfig"]; //从config读取的配置-打包后可以修改-变化
         const timestamp: number = Date.parse(new Date().toString())/1000;
         if(pagedata.requestData.method=="get"){
-            return axios.get(pagedata.requestData.url, { params: params,headers: {'verify-time': timestamp,"verify-encrypt":md5(API_SECRET+timestamp)} })
+            return axios.get(pagedata.requestData.url, { params: params,headers: {'verify-time': timestamp,"verify-encrypt":md5(API_SECRET+timestamp)} });
           }else if(pagedata.requestData.method=="post"){
             return axios.post(pagedata.requestData.url, params,{headers: {'verify-time': timestamp,"verify-encrypt":md5(API_SECRET+timestamp)}});
           }else if(pagedata.requestData.method=="delete"){
-            return axios.delete(pagedata.requestData.url,params,{headers: {'verify-time': timestamp,"verify-encrypt":md5(API_SECRET+timestamp)}});
+            return axios.delete(pagedata.requestData.url,{ params: params,headers: {'verify-time': timestamp,"verify-encrypt":md5(API_SECRET+timestamp)} });
           }else{
             return false
           }
@@ -395,7 +394,7 @@
               createMessage.warning({ content: '未获取数据', key:"getDBField", duration: 2 });
             }
           }else{
-            createMessage.warning('请选择接口！');
+            createMessage.warning('请选择接口或未填写数据库');
           }
         }
         //点击行

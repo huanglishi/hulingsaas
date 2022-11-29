@@ -287,9 +287,9 @@
         if(pagedata.requestData.method=="get"){
             return defHttp.get({ url: pagedata.requestData.url, params:params}, { isReturnNativeResponse: true })
           }else if(pagedata.requestData.method=="post"){
-            return defHttp.post({ url: pagedata.requestData.url, params:pagedata.requestData.param}, { isReturnNativeResponse: true});
+            return defHttp.post({ url: pagedata.requestData.url, params:params}, { isReturnNativeResponse: true});
           }else if(pagedata.requestData.method=="delete"){
-            return defHttp.delete({ url: pagedata.requestData.url, params:pagedata.requestData.param}, { isReturnNativeResponse: true});
+            return defHttp.delete({ url: pagedata.requestData.url, params:params}, { isReturnNativeResponse: true});
           }else{
             return false
           }

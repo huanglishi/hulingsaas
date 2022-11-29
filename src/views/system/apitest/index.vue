@@ -181,12 +181,12 @@
         fetching:true,
         //请求参数
         requestData:{id:0,title:"请选择请求接口",url:"",method:"get",param:'{"title":"示例参数"}',des:"",tablename:"",useFrom:"pc"},
-        requestAfter:{step:"none",result:"",laoding:"warning",status:200,message:"",code:0},
+        requestAfter:{step:"none",result:"",laoding:"wait",status:200,message:"",code:0},
       });
 
       //请求状态
       const getTagColor = computed(() => {
-        if(pagedata.requestAfter.laoding=="warning"){
+        if(pagedata.requestAfter.laoding=="wait"){
           return "default"
         }else if(pagedata.requestAfter.laoding=="processing"){
           return "processing"
@@ -259,13 +259,13 @@
       }
       //刷新
       function reflash(){
-        pagedata.requestAfter={step:"none",result:"",laoding:"warning",status:200,message:"",code:0}
+        pagedata.requestAfter={step:"none",result:"",laoding:"wait",status:200,message:"",code:0}
         reload();
       }
       //开启请求
       async function handelRequest(){
         if(!pagedata.requestData.url){
-          createMessage.warning('请选择测试接口！');
+          createMessage.wait('请选择测试接口！');
           return;
         }
         pagedata.requestAfter.laoding="processing"
@@ -361,7 +361,7 @@
         function copyURL(url){
           const value = unref(url);
             if (!value) {
-              createMessage.warning('请输入要拷贝的内容！');
+              createMessage.wait('请输入要拷贝的内容！');
               return;
             }
             clipboardRef.value = value;
@@ -378,9 +378,9 @@
             content:  h("pre", props, des),
           });
           }else if(title){
-            createMessage.warning('接口没有备注！');
+            createMessage.wait('接口没有备注！');
           }else{
-            createMessage.warning('请选择接口！');
+            createMessage.wait('请选择接口！');
           }
         }
         //展示字段
@@ -392,10 +392,10 @@
                openField(true, fData);
               createMessage.success({ content: '获取成功！', key:"getDBField", duration: 2 });
             }else{
-              createMessage.warning({ content: '未获取数据', key:"getDBField", duration: 2 });
+              createMessage.wait({ content: '未获取数据', key:"getDBField", duration: 2 });
             }
           }else{
-            createMessage.warning('请选择接口或未填写数据库!');
+            createMessage.wait('请选择接口或未填写数据库!');
           }
         }
         //点击行

@@ -39,6 +39,8 @@ export interface UserInfo {
   salt: string;
   accountID: string | number;
   avatar: string;
+  //is_admin是否为管理账号1=是，可以添加模板
+  is_admin: number;
   desc?: string;
   homePath?: string;
   roles: RoleInfo[];

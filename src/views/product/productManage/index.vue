@@ -66,7 +66,7 @@
         useSearchForm: true,
         showTableSetting: true,
         bordered: true,
-        showIndexColumn: true,
+        showIndexColumn: false,
         actionColumn: {
           width: 80,
           title: '操作',

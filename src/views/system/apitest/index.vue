@@ -28,8 +28,11 @@
               <a-input v-model:value="searchForm.keyword" placeholder="输入接口名称" allowClear/>
              </div>
              <div class="search_item">
+              <a-input v-model:value="searchForm.url" placeholder="输入请求地址" allowClear/>
+             </div>
+             <div class="search_item">
                 <a-button type="primary" style="margin-right: 3px;" @click="handelSearchApi">查找</a-button>
-               <a-button @click="()=>{searchForm={keyword:'',cid:null}}">重置</a-button>
+               <a-button @click="()=>{searchForm={keyword:'',url:'',cid:null}}">重置</a-button>
              </div>
           </div>
           <div class="group">
@@ -175,7 +178,7 @@
       const pagedata = reactive({
         //分组
         grouplist:[],
-        searchForm:{cid:null,keyword:""},
+        searchForm:{cid:null,keyword:"",url:""},
         status:"none",
         isRequest:false,
         fetching:true,

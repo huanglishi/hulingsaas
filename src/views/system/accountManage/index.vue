@@ -88,7 +88,6 @@
         });
         //头像初始化
         const avatar = computed(() => {
-          console.log( userStore.getUserInfo)
           const { avatar } = userStore.getUserInfo;
           return avatar;
         });

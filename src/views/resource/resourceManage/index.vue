@@ -360,6 +360,7 @@
                   align-items: center;
                   height: 100px;
                   background-color: #f3f3f3;
+                  overflow: hidden;
                   .img_preview{
                     box-sizing: border-box;
                     border: 1px solid #e7e7eb;

@@ -340,7 +340,7 @@
      if(unref(ID)==0){
           setTitle('新建轻站');
           nextTick(()=>{
-            editWebPage()
+            // editWebPage()
           })
       }else{
           setTitle('编辑轻站');

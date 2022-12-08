@@ -3,17 +3,23 @@ import { FormSchema } from '/@/components/Table';
 
 export const columns: BasicColumn[] = [
   {
+    title: '分组',
+    dataIndex: 'catename',
+    width: 80,
+  },
+  {
     title: '接口名称',
     dataIndex: 'title',
     align:"left"
   },
   {
-    title: '分组',
-    dataIndex: 'catename',
+    title: '请求地址',
+    dataIndex: 'url',
   },
   {
     title: '请求方式',
     dataIndex: 'method',
+    width: 80,
   },
   {
     title: '状态',

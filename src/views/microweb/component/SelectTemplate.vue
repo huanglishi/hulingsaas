@@ -7,6 +7,7 @@
     :showOkBtn="false"
     :showCancelBtn="false"
      width="85%"
+     :minHeight="590"
     :bodyStyle="{ background: '#ededed'}"
   >
     <div class="listbox">

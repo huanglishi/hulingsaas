@@ -4,22 +4,31 @@ import {   h } from 'vue';
 import { Tinymce } from '/@/components/Tinymce/index';
 export const columns: BasicColumn[] = [
   {
-    title: '名称',
+    title: '标题',
     dataIndex: 'name',
     align:"left"
   },
   {
-    title: '上级',
-    dataIndex: 'pidname',
+    title: '描述',
+    dataIndex: 'des',
   },
   {
-    title: '排序',
-    dataIndex: 'weigh',
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    width: 120,
+    title: '处理时间',
+    dataIndex: 'backtime',
+    customRender: ({ record }) => {
+      const timestamp = record.backtime;
+      if(!timestamp){
+          return "未处理";
+      }
+      // 计算年月日时分的函数
+      var date = new Date(timestamp*1000)
+      var Y = date.getFullYear() + '-'
+      var M = (date.getMonth() + 1) + '-'
+      var D = date.getDate() + ' '
+      var H = date.getHours() +":" 
+      var S= date.getMinutes()  
+      return Y + M + D +H +S
+    },
   },
 ];
 

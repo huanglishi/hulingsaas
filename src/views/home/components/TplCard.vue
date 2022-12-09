@@ -76,7 +76,6 @@
   import { Icon } from '/@/components/Icon';
   import { QrCode} from '/@/components/Qrcode/index';
   import { useUserStore } from '/@/store/modules/user';
-  import { encodeURLS } from '/@/utils/imgurl';
   import { useModal } from '/@/components/Modal';
   //路由
   import { useRouter } from 'vue-router';

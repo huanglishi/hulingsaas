@@ -2,14 +2,26 @@
   <BasicModal 
   v-bind="$attrs" 
   @register="registerModal" 
+  @ok="handleSubmit" 
   title="阅读文章" 
   width="920px" 
   :minHeight="550"
+  :showCancelBtn="false"
+  okText="关闭"
   >
+   <div class="readarticle">
+     <div class="title">
+       {{pagedata.title}}
+     </div>
+     <div class="content_box">
+       <div class="content_veiw" v-bind:innerHTML="pagedata.content">
+       </div>
+     </div>
+   </div>
   </BasicModal>
 </template>
 <script lang="ts">
-  import { defineComponent, ref,  unref } from 'vue';
+  import { defineComponent, ref } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   // import { useMessage } from '/@/hooks/web/useMessage';
   //API
@@ -19,36 +31,37 @@
     components: { BasicModal},
     emits: ['success', 'register'],
     setup( ) {
-      const isUpdate = ref(true);
-      const rowId = ref('');
-      const grouplist = ref([]);
+      const pagedata = ref({title:"",content:""});
       // const {createMessage,createSuccessModal} = useMessage();
-
-      const [registerModal, { setModalProps }] = useModalInner(async (data) => {
+      const [registerModal, { setModalProps ,closeModal}] = useModalInner(async (data) => {
+        console.log("日志：",data)
         setModalProps({ confirmLoading: false });
-        isUpdate.value = !!data?.isUpdate;
-        if (unref(isUpdate)) {
-          rowId.value = data.record.id;
-          const bigdata = await getArticle({id:data.record.id});
-          if(bigdata){
-          
-          }
-        }
+        pagedata.value = await getArticle({id:data.id});
       });
-      //提交数据
-
+      function handleSubmit(){
+        closeModal();
+      }
       return { 
          registerModal, 
-         grouplist
+         handleSubmit,
+         pagedata
         };
     },
   });
 </script>
 <style lang="less" scoped>
-:deep(.tox-tbtn__select-label){
-  width: auto;
-}
-:deep(.tox .tox-toolbar){
-  border-top:0px;
-}
+ .readarticle{
+  padding: 15px;
+  .title{
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .content_box{
+    margin-top: 15px;
+    .content_veiw{
+
+    }
+  }
+ }
 </style>

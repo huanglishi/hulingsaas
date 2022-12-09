@@ -4,12 +4,14 @@
     <div class="arcle__list">
       <div class="arcle_ul">
         <div class="arcle_li" v-for="list in datalist" :key="list.id">
-          <div class="text">{{list.title}}</div>
+          <div class="text" @click="addCustomtpl(list.id)">{{list.title}}</div>
           <div class="icons"><Icon icon="line-md:thumbs-up"></Icon></div>
         </div>
       </div>
       <div class="split_notext"></div>
     </div>
+    <!--展示文章详情-->
+    <ViewArticleModal @register="registerModal" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -19,11 +21,21 @@
   //组件
   import {ref } from 'vue';
   import { Icon } from '/@/components/Icon';
+  import ViewArticleModal  from '/@/views/home/ViewArticleModal.vue';
+  import { useModal } from '/@/components/Modal';
   const datalist = ref<ArticleItem[]>([]);
   const gatlist  =async ()=>{
     datalist.value=await getArticleList({}) 
   }
   gatlist()
+  //提交模板需求
+  const [registerModal, { openModal }] = useModal();
+  function addCustomtpl(id){
+    openModal(true, {
+      id:id,
+      isUpdate: false,
+    });
+  }
   defineProps({
     loading: {
       type: Boolean,

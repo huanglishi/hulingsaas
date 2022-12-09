@@ -15,13 +15,13 @@
 <script lang="ts" setup>
   import { ArticleItem } from './data';
   //api
-  import { getArticle } from '/@/api/home/base';
+  import { getArticleList } from '/@/api/home/base';
   //组件
   import {ref } from 'vue';
   import { Icon } from '/@/components/Icon';
   const datalist = ref<ArticleItem[]>([]);
   const gatlist  =async ()=>{
-    datalist.value=await getArticle({}) 
+    datalist.value=await getArticleList({}) 
   }
   gatlist()
   defineProps({
@@ -69,6 +69,7 @@
           .text{
             font-size: 14px;
             color: #333;
+            cursor: pointer;
           }
           .icons{
             cursor: pointer;

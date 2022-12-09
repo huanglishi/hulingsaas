@@ -50,7 +50,7 @@
                         <div class="icons"><Icon icon="line-md:download-loop" :size="20"></Icon></div>
                          <div class="text">下载</div>
                        </div>
-                       <div class="copy" @click="copyLink(viewUrl(1))">
+                       <div class="copy" @click="copyLink(viewUrl(micwe?.id))">
                         <div class="icons"><Icon icon="ph:copy-simple-fill" :size="18"></Icon></div>
                          <div class="text">复制</div>
                        </div>
@@ -125,7 +125,6 @@
   //路由
   import { useRouter } from 'vue-router';
   import { useUserStore } from '/@/store/modules/user';
-  import { encodeURLS } from '/@/utils/imgurl';
   import { useMessage } from '/@/hooks/web/useMessage';
   //提示弹框
   const {
@@ -218,7 +217,7 @@
     }
   }
   function viewUrl(id) {
-    return  unref(tplpreviewurl)+'/#/preview?id='+encodeURLS(id)
+    return  unref(tplpreviewurl)+id
   }
   //复制
   function copyLink(value){

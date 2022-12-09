@@ -4,6 +4,7 @@
  import { defHttp } from '/@/utils/http/axios';
 
  enum Api {
+  GetArticleList = '/home/base/getArticleList',
   GetArticle = '/home/base/getArticle',
   GetMicweb = '/home/base/getMicweb',
   SaveMicweb = '/home/base/saveMicweb',
@@ -12,6 +13,10 @@
  
  
  //1 获取系统文章
+ export const getArticleList = (params) => {
+   return defHttp.get({ url: Api.GetArticleList,params:params });
+ };
+ //1 获取系统文章-详情
  export const getArticle = (params) => {
    return defHttp.get({ url: Api.GetArticle,params:params });
  };

@@ -19,7 +19,7 @@
                 <div class="template_image_mask">
                   <div class="qrcode_img">
                     <QrCode
-                        :value="tplpreviewurl+'/#/preview?id='+encodeURLS(list.id)"
+                        :value="(tplpreviewurl+list.id)"
                         tag="img"
                         class="preview_code"
                         :width="130"
@@ -42,7 +42,7 @@
                         <Icon class="emptyicon" size="120"  icon="line-md:question"></Icon>
                         <div class="emptytext">
                           <div class="tig">未找到您想要的模板</div>
-                          <div class="btn"><a>提交需求</a></div>
+                          <div class="btn" @click="addCustomtpl"><a>提交需求</a></div>
                         </div>
                       </div>
                     </div>
@@ -62,6 +62,8 @@
     </s3-layer>
      <!--选择模板-->
      <SelectTemplate @register="selectTemplateModal" />
+     <!--添加模板需求-->
+    <addTplModal @register="registerModal"  />
   </div>
 </template>
 <script lang="ts" setup>
@@ -79,7 +81,8 @@
   //路由
   import { useRouter } from 'vue-router';
   import { useMessage } from '/@/hooks/web/useMessage';
-  
+  //组件
+  import addTplModal  from '/@/views/common/customtpl/addTplModal.vue';
   const router = useRouter();
   const userStore = useUserStore();
   const tplpreviewurl = ref(userStore.getUserInfo?.tplpreviewurl || '');
@@ -119,7 +122,7 @@
     id= encodeURLS(id) // 加密
     iframedata.value={
         show:true,
-        content:`${tplpreviewurl.value}/#/preview?id=${id}`,
+        content:`${tplpreviewurl.value}${id}`,
         title:title,
       }
   }
@@ -138,10 +141,16 @@
         window.open(routeUrl.href, '_blank');
       },
     });
-   
   }
   getTpl()
   grouplist()
+  //提交模板需求
+  const [registerModal, { openModal }] = useModal();
+  function addCustomtpl(){
+    openModal(true, {
+      isUpdate: false,
+    });
+  }
   defineProps({
     loading: {
       type: Boolean,

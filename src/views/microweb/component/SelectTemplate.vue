@@ -41,7 +41,7 @@
                       <img :src="item['image']" class="preview_img">
                       <div class="code_layer" >
                         <QrCode
-                          :value="tplpreviewurl+'/#/preview?id='+encodeURLS(item['id'])"
+                          :value="tplpreviewurl+item['id']"
                           tag="img"
                           class="preview_code"
                           :width="130"
@@ -63,7 +63,7 @@
                         <Icon class="emptyicon" size="120"  icon="ph:question-thin"></Icon>
                         <div class="emptytext">
                           <div class="tig">未找到您想要的模板</div>
-                          <div class="btn"><a>提交需求</a></div>
+                          <div class="btn" @click="addCustomtpl"><a>提交需求</a></div>
                         </div>
                       </div>
                     </div>
@@ -83,6 +83,9 @@
           :area="['380px', '667px']"
         >
         </s3-layer>
+
+        <!--添加模板需求-->
+        <addTplModal @register="registerModal"  />
     </div>
   </BasicModal>
 </template>
@@ -98,9 +101,12 @@
   import { useRouter } from 'vue-router';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
+  //组件
+  import { useModal } from '/@/components/Modal';
+  import addTplModal  from '/@/views/common/customtpl/addTplModal.vue';
   export default defineComponent({
     name:"SelectTemplate",
-    components: { BasicModal,Icon,[Popover.name]:Popover,QrCode,[Spin.name]:Spin},
+    components: { BasicModal,Icon,[Popover.name]:Popover,QrCode,[Spin.name]:Spin,addTplModal},
     emits: ['upcateData','upWebTpl'],
     setup(_, { emit }) {
       //提示
@@ -194,10 +200,9 @@
       }
       //预览
       function previewWenb(id,title){
-        id= encodeURLS(id) // 加密
         iframedata.value={
             show:true,
-            content:`${tplpreviewurl.value}/#/preview?id=${id}`,
+            content:`${tplpreviewurl.value}${id}`,
             title:title,
           }
       }
@@ -215,11 +220,12 @@
           })
         });
       }
-      function encodeURLS(str) {
-          return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
-              function toSolidBytes(match, p1) {
-                  return String.fromCharCode('0x' + p1);
-              }));
+      //提交模板需求
+      const [registerModal, { openModal }] = useModal();
+      function addCustomtpl(){
+        openModal(true, {
+          isUpdate: false,
+        });
       }
       return {
         ...toRefs(datas),changCate,
@@ -227,7 +233,8 @@
         register,
         closeModal,
         upcateData,changCateItem,
-        useWeb,previewWenb,tplpreviewurl,encodeURLS,iframedata,del,accountID,
+        useWeb,previewWenb,tplpreviewurl,iframedata,del,accountID,
+        registerModal,addCustomtpl,
       };
     },
   });

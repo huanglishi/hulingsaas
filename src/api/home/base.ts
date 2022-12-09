@@ -6,6 +6,7 @@
  enum Api {
   GetArticleList = '/home/base/getArticleList',
   GetArticle = '/home/base/getArticle',
+  PushStar = '/home/base/pushStar',
   GetMicweb = '/home/base/getMicweb',
   SaveMicweb = '/home/base/saveMicweb',
   PublishMicweb = '/home/base/publishMicweb',
@@ -20,6 +21,10 @@
  export const getArticle = (params) => {
    return defHttp.get({ url: Api.GetArticle,params:params });
  };
+ //添加教程文章的赞
+export const pushStar = (params?: object) =>
+defHttp.post({ url: Api.PushStar, params:params}, { errorMessageMode: 'message' });
+
  //2 获取微站数据
  export const getMicweb = (params) => {
    return defHttp.get({ url: Api.GetMicweb,params:params });

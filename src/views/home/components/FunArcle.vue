@@ -5,7 +5,7 @@
       <div class="arcle_ul">
         <div class="arcle_li" v-for="list in datalist" :key="list.id">
           <div class="text" @click="addCustomtpl(list.id)">{{list.title}}</div>
-          <div class="icons"><Icon icon="line-md:thumbs-up"></Icon></div>
+          <div class="icons" @click="addStar(list.id)"><Icon icon="line-md:thumbs-up"></Icon></div>
         </div>
       </div>
       <div class="split_notext"></div>
@@ -17,12 +17,14 @@
 <script lang="ts" setup>
   import { ArticleItem } from './data';
   //api
-  import { getArticleList } from '/@/api/home/base';
+  import { getArticleList ,pushStar} from '/@/api/home/base';
   //组件
   import {ref } from 'vue';
   import { Icon } from '/@/components/Icon';
   import ViewArticleModal  from '/@/views/home/ViewArticleModal.vue';
   import { useModal } from '/@/components/Modal';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  const {createMessage} = useMessage();
   const datalist = ref<ArticleItem[]>([]);
   const gatlist  =async ()=>{
     datalist.value=await getArticleList({}) 
@@ -35,6 +37,11 @@
       id:id,
       isUpdate: false,
     });
+  }
+  //添加赞数
+  async function addStar(id){
+     await pushStar({id:id}) 
+     createMessage.success("谢谢你的赞！")
   }
   defineProps({
     loading: {

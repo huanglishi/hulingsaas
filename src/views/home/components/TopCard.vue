@@ -107,8 +107,16 @@
              <div class="icon order_icon"></div>
              <div class="text">订单管理</div>
           </div>
+          <div class="functions_item" @click="openViewList">
+             <div class="icon fontIcon">
+               <Icon icon="fluent:mail-template-20-filled" color="#64a2ff" :size="35"></Icon>
+             </div>
+             <div class="text">申请模板</div>
+          </div>
         </div>
      </div>
+      <!--显示申请的模板列表-->
+      <ViewListModal @register="registerModal" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -126,6 +134,9 @@
   import { useRouter } from 'vue-router';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
+  //申请的模板需求弹框
+  import ViewListModal  from '/@/views/common/customtpl/ViewListModal.vue';
+  import { useModal } from '/@/components/Modal';
   //提示弹框
   const {
     createMessage,
@@ -216,8 +227,9 @@
       qrEl.download(filename);//文件名
     }
   }
+  //预览地址
   function viewUrl(id) {
-    return  unref(tplpreviewurl)+id
+    return  unref(tplpreviewurl)+"?id="+id
   }
   //复制
   function copyLink(value){
@@ -232,6 +244,13 @@
         createMessage.warning('要拷贝的内容失败！');
       }
     }
+  //查看申请的模板需求
+  const [registerModal, { openModal }] = useModal();
+  function openViewList(){
+    openModal(true, {
+      isUpdate: false,
+    });
+  }
   defineProps({
     loading: {
       type: Boolean,
@@ -453,5 +472,11 @@
         }
       }
     }
+  }
+  .fontIcon{
+    color: #5997ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>

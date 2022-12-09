@@ -119,10 +119,9 @@
   })
   //预览
   function previewWenb(id,title){
-    id= encodeURLS(id) // 加密
     iframedata.value={
         show:true,
-        content:`${tplpreviewurl.value}${id}`,
+        content:`${tplpreviewurl.value}?tplId=${id}`,
         title:title,
       }
   }

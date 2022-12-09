@@ -52,7 +52,7 @@
                       />
                         <div class="template_btn use_btn" @click="useWeb(item['jsondata'])">马上使用</div>
                         <div class="template_btn preview_btn" @click="previewWenb(item['id'],item['title'])">点击预览</div>
-                        <div class="template_btn del_btn" v-if="accountID==item['accountID']" @click="del(item['id'],item['title'])">删除</div>
+                        <div class="template_btn del_btn" v-if="(is_admin==1)" @click="del(item['id'],item['title'])">删除</div>
                       </div>
                     </div>
                   </div>
@@ -121,7 +121,7 @@
       //用户信息
       const userStore = useUserStore();
       const tplpreviewurl = ref(userStore.getUserInfo?.tplpreviewurl || '');
-      const accountID = ref(userStore.getUserInfo?.accountID || 0);
+      const is_admin = ref(userStore.getUserInfo?.is_admin || 0);
       const router = useRouter();
       //打开窗口
       const isUpdate = ref(true);
@@ -233,7 +233,7 @@
         register,
         closeModal,
         upcateData,changCateItem,
-        useWeb,previewWenb,tplpreviewurl,iframedata,del,accountID,
+        useWeb,previewWenb,tplpreviewurl,iframedata,del,is_admin,
         registerModal,addCustomtpl,
       };
     },

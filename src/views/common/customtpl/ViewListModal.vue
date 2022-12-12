@@ -24,7 +24,7 @@
                   <div class="label">定制模板：</div>
                   <div class="text">
                     <a-button type="primary" @click="useCusTpl(pagedata)">使用模板</a-button>
-                    <Popconfirm placement="leftTop" ok-text="关闭" :showCancel="false">
+                    <Popconfirm placement="leftTop" ok-text="复制" cancel-text="关闭" @confirm="copyData(pagedata['tpl_id'])">
                       <template #title>
                          <div class="viewqrcode">
                           <QrCode
@@ -85,16 +85,17 @@
   //表格
   import { BasicTable, useTable } from '/@/components/Table';
   import { columns } from './data';
-  // import { useMessage } from '/@/hooks/web/useMessage';
+  import { useMessage } from '/@/hooks/web/useMessage';
   //API
   import { getList,getCustomtpl } from '/@/api/common/customtpl';
   import { Empty ,Divider,Popconfirm} from 'ant-design-vue';
   //路由
   import { useRouter } from 'vue-router';
-  import { useMessage } from '/@/hooks/web/useMessage';
   import { useLoading } from '/@/components/Loading';
   import { useUserStore } from '/@/store/modules/user';
   import { QrCode } from '/@/components/Qrcode/index';
+  //复制
+  import { useCopyToClipboard } from '/@/hooks/web/useCopyToClipboard';
   export default defineComponent({
     name: 'ViewListModal',
     components: { BasicModal,Empty,BasicTable,ADivider:Divider,Popconfirm,QrCode},
@@ -105,7 +106,7 @@
       const {
           createConfirm,
         } = useMessage();
-      // const {createMessage,createSuccessModal} = useMessage();
+      const {createMessage} = useMessage();
       const [registerModal, { setModalProps ,closeModal}] = useModalInner(async () => {
         setModalProps({ confirmLoading: false });
         reload()
@@ -114,6 +115,7 @@
       function handleSubmit(){
         closeModal();
       }
+      const { clipboardRef, copiedRef } = useCopyToClipboard(); //复制
       //表格
       const [registerTable, { reload}] = useTable({
         api: getList,
@@ -166,9 +168,23 @@
       });
       const userStore = useUserStore();
       const tplpreviewurl = ref(userStore.getUserInfo?.tplpreviewurl || '');
-        //预览地址
-      function viewUrl(id) {
+      //预览地址
+      function viewUrl(id:any) {
         return  unref(tplpreviewurl)+"?tplId="+id
+      }
+      //复制
+      function copyData(id:any){
+        const value= unref(tplpreviewurl)+"?tplId="+id
+          if (!value) {
+              createMessage.warning('要拷贝的内容为空！');
+              return;
+            }
+            clipboardRef.value = value;
+            if (unref(copiedRef)) {
+              createMessage.success({ content: '复制成功！', key:"webcopyLink",duration:2});
+            }else{
+              createMessage.warning('要拷贝的内容失败！');
+            }
       }
       return { 
          registerModal, 
@@ -176,6 +192,7 @@
          pagedata,
          registerTable,
          reload,selectData,useCusTpl,wrapEl,viewUrl,
+         copyData,
         };
     },
   });
@@ -217,5 +234,8 @@
       align-items: center;
     }
   }
+ }
+ .viewqrcode{
+   margin-right: 20px;
  }
 </style>

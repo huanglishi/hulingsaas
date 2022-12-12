@@ -16,6 +16,7 @@
     GetPicture = '/file/manage/getPicture',
  }
  const globSetting = useGlobSetting();
+ console.log("上传路径",globSetting.fileuploadUrl)
 //保存数据
 export const saveFile = (params?: object) =>
 defHttp.post({ url: Api.SaveFile, params:params}, { errorMessageMode: 'message' });

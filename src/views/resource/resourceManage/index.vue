@@ -41,6 +41,7 @@
                 <a-button size="small" @click="UpVideo" style="margin-right: 5px;" preIcon="">上传视频</a-button>
                 <a-button size="small" @click="UpImage" style="margin-right: 5px;">上传图片</a-button>
                 <a-button size="small" @click="refreshData">刷新列表</a-button>
+                <!-- <a-button size="small" @click="DelTest">删除</a-button> -->
              </div>
            </div>
          </div>
@@ -266,12 +267,16 @@
       function refreshData(){
         getpicture("");
       }
+      // async function DelTest(){
+      //    await delTest()
+      // }
       return {
         ...toRefs(pagedata),
         //附件
         UpVideo,UpImage,registerFileManage,selectFile,
         onSelectImg,ReplaceUrl,onDel,refreshData,
         onChangFile,onUpFile,delAll,isCheckAll,onChangePage,filterSize,
+        // DelTest,
       };
     },
   });

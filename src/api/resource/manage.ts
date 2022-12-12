@@ -12,6 +12,7 @@
     DelFile = '/resource/manage/delFile',
     UpFile = '/resource/manage/upFile',
     GetPicture = '/resource/manage/getPicture',
+    DelTest = '/resource/manage/delTest',
  }
 const globSetting = useGlobSetting();
 //保存数据
@@ -32,9 +33,13 @@ export const getFiles = (params) => {
   return defHttp.get({ url: Api.GetFiles,params:params });
 };
 
-//获取文件列表
+//获取删除文件
 export const delFile = (params?: object) =>
 defHttp.delete({ url: Api.DelFile, params:params}, { errorMessageMode: 'message' });
+
+//删除测试
+export const delTest = (params?: object) =>
+defHttp.delete({ url: Api.DelTest, params:params}, { errorMessageMode: 'message' });
 
 //获取图库分类
 export const getPicture = (params) => {

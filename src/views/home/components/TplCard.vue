@@ -19,7 +19,7 @@
                 <div class="template_image_mask">
                   <div class="qrcode_img">
                     <QrCode
-                        :value="(tplpreviewurl+list.id)"
+                        :value="(tplpreviewurl+'?tplId='+list.id)"
                         tag="img"
                         class="preview_code"
                         :width="130"

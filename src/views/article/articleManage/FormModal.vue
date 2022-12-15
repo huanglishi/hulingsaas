@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit" width="920px" minHeight="550">
+  <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit" width="920px" :minHeight="550">
      <div class="addFormbox" style="min-height:550px">
       <div class="tabs-header">
         <div class="tabs-nav-wrap">

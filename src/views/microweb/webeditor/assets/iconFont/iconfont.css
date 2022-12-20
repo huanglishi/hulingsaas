@@ -1,0 +1,147 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 3758994 */
+  src: url('iconfont.woff2?t=1670311083030') format('woff2'),
+       url('iconfont.woff?t=1670311083030') format('woff'),
+       url('iconfont.ttf?t=1670311083030') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-rongqi:before {
+  content: "\e635";
+}
+
+.icon-kong:before {
+  content: "\e708";
+}
+
+.icon-upload:before {
+  content: "\eb79";
+}
+
+.icon-yonghu:before {
+  content: "\e8c8";
+}
+
+.icon-gerenziliao:before {
+  content: "\e607";
+}
+
+.icon-mima:before {
+  content: "\e8b2";
+}
+
+.icon-kefu:before {
+  content: "\e625";
+}
+
+.icon-jiantou-you:before {
+  content: "\eb6b";
+}
+
+.icon-home:before {
+  content: "\e603";
+}
+
+.icon-bianji:before {
+  content: "\e602";
+}
+
+.icon-wenhao:before {
+  content: "\e71d";
+}
+
+.icon-guanbi:before {
+  content: "\eb6a";
+}
+
+.icon-icon_play:before {
+  content: "\e60f";
+}
+
+.icon-yangshengqi:before {
+  content: "\e601";
+}
+
+.icon-laba:before {
+  content: "\e60d";
+}
+
+.icon-ditu:before {
+  content: "\e906";
+}
+
+.icon-biaodan:before {
+  content: "\e659";
+}
+
+.icon-shipin:before {
+  content: "\e63d";
+}
+
+.icon-youjiantou:before {
+  content: "\e600";
+}
+
+.icon-chanpin:before {
+  content: "\e6e1";
+}
+
+.icon-tuwen:before {
+  content: "\e652";
+}
+
+.icon-menu_tplb:before {
+  content: "\e649";
+}
+
+.icon-wenzhangliebioa:before {
+  content: "\e6a9";
+}
+
+.icon-lunbotuguanli:before {
+  content: "\e642";
+}
+
+.icon-mofangdaohang:before {
+  content: "\e692";
+}
+
+.icon-jiantou-zuo:before {
+  content: "\e631";
+}
+
+.icon-xialaanniu:before {
+  content: "\e663";
+}
+
+.icon-gonggao:before {
+  content: "\e627";
+}
+
+.icon-shanchu:before {
+  content: "\e8b6";
+}
+
+.icon-tupian:before {
+  content: "\e8ba";
+}
+
+.icon-wenben:before {
+  content: "\e60b";
+}
+
+.icon-gongzuotai:before {
+  content: "\e626";
+}
+
+.icon-hetongliebiao:before {
+  content: "\e629";
+}
+

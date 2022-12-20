@@ -24,6 +24,7 @@ import { registerGlobComp } from '/@/components/registerGlobComp';
 
 async function bootstrap() {
   const app = createApp(App);
+  app.config.warnHandler = () => null
   //Layer弹框
   // Configure store
   // 配置 store

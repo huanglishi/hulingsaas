@@ -42,7 +42,7 @@
                       <img :src="item['image']" class="preview_img">
                       <div class="code_layer" >
                         <QrCode
-                          :value="tplpreviewurl+item['id']"
+                          :value="tplpreviewurl+'?tplId='+item['id']"
                           tag="img"
                           class="preview_code"
                           :width="130"
@@ -51,7 +51,7 @@
                             scale:5
                           }"
                       />
-                        <div class="template_btn use_btn" @click="useWeb(item['jsondata'])">马上使用</div>
+                        <div class="template_btn use_btn" @click="useWeb(item['id'])">马上使用</div>
                         <div class="template_btn preview_btn" @click="previewWenb(item['id'],item['title'])">点击预览</div>
                         <div class="template_btn del_btn" v-if="(is_admin==1)" @click="del(item['id'],item['title'])">删除</div>
                       </div>
@@ -91,7 +91,7 @@
   </BasicModal>
 </template>
 <script lang="ts">
-  import { defineComponent ,nextTick,onMounted, reactive,toRefs,ref,unref} from 'vue';
+  import { defineComponent ,nextTick,onMounted, reactive,toRefs,ref} from 'vue';
   //APi
   import {getSelectTplGroup, getSelectTplList,delWebTpl } from '/@/api/microweb/webtpl';
   //组件
@@ -188,22 +188,27 @@
         winHeight.value=h
       }
       //选择模板
-      function useWeb(jsondata){
-        closeModal()
-        if (unref(isUpdate)) {
-           emit('upWebTpl',jsondata);
-        }else{
-          router.push({
-          name:'webeditor', 
-          query:{id:0},
-          params:{data:jsondata}})
-        }
+      function useWeb(id){
+        let routeUrl = router.resolve({
+            path: "/webeditor",
+            query: {id:id}
+          });
+          createConfirm({
+            iconType: "info",
+            title: '您确定使用该模板吗?',
+            content: '如果之前已经编辑，将覆盖原来数据。',
+            okText:"使用",
+            onOk(){
+              closeModal()
+              window.open(routeUrl.href, '_blank');
+            },
+          });
       }
       //预览
       function previewWenb(id,title){
         iframedata.value={
             show:true,
-            content:`${tplpreviewurl.value}${id}`,
+            content:`${tplpreviewurl.value}?tplId=${id}`,
             title:title,
           }
       }

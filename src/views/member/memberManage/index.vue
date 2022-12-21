@@ -1,6 +1,26 @@
 <template>
   <div>
     <BasicTable @register="registerTable">
+      <template #form-custom="{model, field}"> 
+        <a-select
+            v-model:value="model[field]"
+            show-search
+            allowClear
+            placeholder="选择分组"
+            style="width: 100%"
+            :default-active-first-option="false"
+            :show-arrow="false"
+            :filter-option="false"
+            :not-found-content="fetching ? undefined : null"
+            @search="searchGroup"
+            @focus="searchGroup('')"
+          >
+          <template v-if="fetching" #notFoundContent>
+            <Spin size="small" />
+          </template>
+          <a-select-option v-for="item in grouplist"  :value="item['id']+''"><span v-html="item['name']"></span></a-select-option>
+        </a-select>
+      </template>
       <template #toolbar>
         <!-- <a-button type="primary" @click="handleCreate"> 新增分类 </a-button> -->
       </template>
@@ -25,18 +45,20 @@
   </div>
 </template>
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent,ref } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getList } from '/@/api/member/manage';
   import { columns, searchFormSchema } from './data';
   import { Icon } from '/@/components/Icon';
-  import { Popconfirm } from 'ant-design-vue';
+  import { Popconfirm,Select,Spin} from 'ant-design-vue';
   import { useModal } from '/@/components/Modal';
   //组件
   import FormModal from './FormModal.vue';
+  import { getGroupList } from '/@/api/member/group';
   export default defineComponent({
     name: 'memberManage',
-    components: { BasicTable, TableAction,FormModal, Icon,[Popconfirm.name]:Popconfirm},
+    components: { BasicTable, TableAction,FormModal, Icon,[Popconfirm.name]:Popconfirm,
+        ASelect:Select,ASelectOption:Select.Option ,Spin},
     setup() {
       const [registerTable, { reload ,updateTableDataRecord}] = useTable({
         title: '会员列表',
@@ -97,6 +119,20 @@
             return color
           }
       }
+      //搜索分组
+      function searchGroup(val) {
+        getFormGroupList(val)
+      }
+       //获取分组数据
+       const grouplist = ref([]);
+       const fetching = ref(false);
+       async function getFormGroupList(keyword){
+        fetching.value=true
+        let treeData= await getGroupList({keyword:keyword})
+        if(!treeData) treeData=[]
+        grouplist.value = treeData
+        fetching.value=false
+      }
       return {
         registerTable,
         handleCreate,
@@ -104,6 +140,7 @@
         handleDelete,
         statusFont,
         handleSuccess,registerModal,
+        searchGroup,grouplist,fetching,
       };
     },
   });

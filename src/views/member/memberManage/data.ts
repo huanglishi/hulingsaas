@@ -4,6 +4,7 @@ import { h } from 'vue';
 import { Switch } from 'ant-design-vue';
 import { upLock} from  '/@/api/member/manage';
 import { useMessage } from '/@/hooks/web/useMessage';
+import { getGroupList } from '/@/api/member/group';
 export const columns: BasicColumn[] = [
   {
     title: '姓名',
@@ -77,10 +78,10 @@ export const columns: BasicColumn[] = [
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'title',
+    field: 'name',
     label: '名称',
     component: 'Input',
-    colProps: { span: 8 },
+    colProps: { span: 6 },
   },
   {
     field: 'status',
@@ -92,13 +93,14 @@ export const searchFormSchema: FormSchema[] = [
         { label: '停用', value: '1' },
       ],
     },
-    colProps: { span: 8 },
+    colProps: { span: 6 },
   },
   {
     field: 'cid',
     label: '分组',
-    component: 'Input',
-    colProps: { span: 8 },
+    component: 'Select',
+    slot: 'custom',
+    colProps: { span: 6 },
   },
 ];
 

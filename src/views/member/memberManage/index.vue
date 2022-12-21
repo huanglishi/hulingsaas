@@ -5,18 +5,23 @@
         <!-- <a-button type="primary" @click="handleCreate"> 新增分类 </a-button> -->
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'status'"  >
-          <a-tag :color="statusFont(record.status,'color')">
-              <template #icon>
-                <Icon :about="statusFont(record.status,'icon')"></Icon>
-              </template>
-              {{statusFont(record.status,'text')}}
-          </a-tag>
-        </template>
+        <!-- <template v-if="column.key === 'status'"  >
+            ss{{ record.status }}
+        </template> -->
         <template v-if="column.key === 'action'"  >
+          <TableAction
+            :actions="[
+              {
+                icon: 'clarity:note-edit-line',
+                onClick: handleEdit.bind(null, record),
+              },
+            ]"
+          />
         </template>
       </template>
     </BasicTable>
+     <!--添加表单-->
+     <FormModal @register="registerModal" @success="handleSuccess" />
   </div>
 </template>
 <script lang="ts">
@@ -26,11 +31,14 @@
   import { columns, searchFormSchema } from './data';
   import { Icon } from '/@/components/Icon';
   import { Popconfirm } from 'ant-design-vue';
+  import { useModal } from '/@/components/Modal';
+  //组件
+  import FormModal from './FormModal.vue';
   export default defineComponent({
     name: 'memberManage',
-    components: { BasicTable, TableAction, Icon,[Popconfirm.name]:Popconfirm},
+    components: { BasicTable, TableAction,FormModal, Icon,[Popconfirm.name]:Popconfirm},
     setup() {
-      const [registerTable, { reload }] = useTable({
+      const [registerTable, { reload ,updateTableDataRecord}] = useTable({
         title: '会员列表',
         api: getList,
         rowKey: 'id',
@@ -51,13 +59,23 @@
           fixed: undefined,
         },
       });
-
+    const [registerModal, { openModal }] = useModal();
+    //表单提交回调
+    function handleSuccess({ isUpdate, values }){
+        if (isUpdate) {
+           updateTableDataRecord(values.id, values);
+        } else {
+          reload();
+        }
+      }
       function handleCreate() {
         reload()
       }
-
       function handleEdit(record: Recordable) {
-        console.log(record)
+        openModal(true, {
+          record,
+          isUpdate: true,
+        });
       }
 
       function handleDelete(record: Recordable) {
@@ -85,6 +103,7 @@
         handleEdit,
         handleDelete,
         statusFont,
+        handleSuccess,registerModal,
       };
     },
   });

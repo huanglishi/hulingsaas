@@ -5,16 +5,21 @@
 
  enum Api {
     GetList = '/member/group/getList',
+    GetGroupList = '/member/group/getGroupList',
     SaveGroup = '/member/group/saveGroup',
     DelGroup = '/member/group/delGroup',
     UpStatus = '/member/group/upStatus',
  }
  
  
- //1.获取列表
- export const getList = (params) => {
-   return defHttp.get({ url: Api.GetList,params:params });
- };
+//1.获取列表
+export const getList = (params) => {
+  return defHttp.get({ url: Api.GetList,params:params });
+};
+//1.获取选择分组列表
+export const getGroupList = (params) => {
+  return defHttp.get({ url: Api.GetGroupList,params:params });
+};
 //2.保存
 export const saveGroup = (params?: object) =>
 defHttp.post({ url: Api.SaveGroup, params:params}, { errorMessageMode: 'message' });

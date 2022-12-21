@@ -9,13 +9,13 @@
                 <a-button color="#ffffff" shape="round" @click="openTapWin('webeditor')">去设计<Icon icon="line-md:telegram" :size="16"></Icon></a-button>
               </div>
           </div>
-          <div class="wrapper_item bg_oldweb"  >
+          <!-- <div class="wrapper_item bg_oldweb"  >
               <div class="title"><Icon icon="teenyicons:mobile-outline" :size="18"></Icon> 手机网站-旧版</div>
               <div class="des">手机端网站，个人名片，产品宣传</div>
               <div class="btn"  >
                 <a-button color="#ffffff" shape="round" @click="openTapWin('oldditor')">去设计<Icon icon="line-md:telegram" :size="16"></Icon></a-button>
               </div>
-          </div>
+          </div> -->
           <div class="site_info_warppe">
               <div class="site_name">
                 <div class="inputbox" v-if="isedit">

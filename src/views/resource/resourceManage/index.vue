@@ -115,7 +115,7 @@
         selectIds:arrselectid,//选择的图片id
         picture:pictureitem,//数据
         page:1,
-        pageSize:15,
+        pageSize:35,
         total:0,
         allnumber:0,
         allsize:0,
@@ -130,7 +130,7 @@
       //获取我的图片
       async function getpicture(searchword:any){
             pagedata.loading=true
-            const getdbdata = await getPicture({searchword:searchword,page:pagedata.page});
+            const getdbdata = await getPicture({searchword:searchword,page:pagedata.page,pageSize:pagedata.pageSize});
               if(getdbdata){
                 pagedata.picture=getdbdata.items
                 pagedata.page=getdbdata.page
@@ -484,6 +484,7 @@
     .pagination{
       text-align: center;
       margin-top: 20px;
+      padding-bottom: 15px;
     }
   }
 }

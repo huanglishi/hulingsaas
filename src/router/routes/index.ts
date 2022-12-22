@@ -27,6 +27,24 @@ export const RootRoute: AppRouteRecordRaw = {
     title: 'Root',
   },
 };
+// 根路由
+export const dashboardAnalysis: AppRouteRecordRaw = {
+  path: '/dashboard/analysis',
+  name: 'Root',
+  redirect: PageEnum.BASE_HOME,
+  meta: {
+    title: 'Root',
+  },
+};
+// 根路由
+export const Dashboard: AppRouteRecordRaw = {
+  path: '/dashboard',
+  name: 'Root',
+  redirect: PageEnum.BASE_HOME,
+  meta: {
+    title: 'Root',
+  },
+};
 
 export const LoginRoute: AppRouteRecordRaw = {
   path: '/login',
@@ -60,7 +78,8 @@ export const oldditor: AppRouteRecordRaw = {
 export const basicRoutes = [
   webeditor,oldditor,
   LoginRoute,
-  RootRoute,
+  RootRoute,Dashboard,
+  dashboardAnalysis,
   REDIRECT_ROUTE,
   PAGE_NOT_FOUND_ROUTE,
 ];

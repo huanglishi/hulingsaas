@@ -45,7 +45,7 @@ export const Dashboard: AppRouteRecordRaw = {
     title: 'Root',
   },
 };
-
+//登录
 export const LoginRoute: AppRouteRecordRaw = {
   path: '/login',
   name: 'Login',

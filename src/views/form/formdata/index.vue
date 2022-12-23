@@ -36,14 +36,30 @@
       <template #toolbar>
       </template>
       <template #bodyCell="{ column, record }">
+        <template v-if="typeof record[column.key]=='object'"  >
+          <template v-if="record[column.key].type=='checkbox'&&record[column.key].value">
+            {{ record[column.key].value.join(",") }}
+          </template>
+          <template v-if="record[column.key].type=='image'&&record[column.key].value">
+             <div class="imagebox">
+              <a-image-preview-group>
+                <a-image :width="50" v-for="img in record[column.key].value" :src="img" />
+              </a-image-preview-group>
+             </div>
+          </template>
+            <!-- {{ objectTostring(record[column.key]) }} -->
+        </template>
+        <template v-if="column.key === 'createtime'"  >
+           {{ timemapTostr(record.createtime) }}
+        </template>
         <template v-if="column.key === 'action'"  >
           <TableAction
             :actions="[
-              {
-                icon: 'clarity:note-edit-line',
-                tooltip: '编辑表单',
-                onClick: handleEdit.bind(null, record),
-              },
+              // {
+              //   icon: 'clarity:note-edit-line',
+              //   tooltip: '编辑表单',
+              //   onClick: handleEdit.bind(null, record),
+              // },
               {
                 icon: 'ant-design:delete-outlined',
                 color: 'error',
@@ -64,7 +80,7 @@
   import { defineComponent,ref,onMounted,unref,nextTick} from 'vue';
   import { BasicTable, useTable, TableAction,BasicColumn} from '/@/components/Table';
   import { Icon } from '/@/components/Icon';
-  import { Popconfirm,Select,RangePicker} from 'ant-design-vue';
+  import { Popconfirm,Select,RangePicker,Image,ImagePreviewGroup} from 'ant-design-vue';
   import { useGo } from '/@/hooks/web/usePage';
   import { useRoute } from 'vue-router';
   //api
@@ -74,6 +90,8 @@
     components: { 
       BasicTable, TableAction, Icon,[Popconfirm.name]:Popconfirm,
       ASelect:Select,ASelectOption:Select.Option,ARangePicker:RangePicker,
+      AImage:Image,
+      AImagePreviewGroup:ImagePreviewGroup,
     },
     setup() {
       const bartitle=ref("表单数据")
@@ -132,7 +150,7 @@
       async function getPageField(){
         var fdata = await getFormField({form_id: unref(formId)});
           if(fdata){
-            const  parnt_columns: BasicColumn[] = [{dataIndex: 'createtime', title: '提交时间',width: 110}] // 定义表单字段
+            const  parnt_columns: BasicColumn[] = [{dataIndex: 'createtime', title: '提交时间',width: 130}] // 定义表单字段
             setColumns(parnt_columns.concat(fdata.list))
             bartitle.value=fdata.title
           }
@@ -148,6 +166,20 @@
           reload();
         })
       }
+      //转时间格式
+      function timemapTostr(timestamp){
+          if(!timestamp){
+              return "---";
+          }
+          // 计算年月日时分的函数
+          var date = new Date(timestamp*1000)
+          var Y = date.getFullYear() + '-'
+          var M = (date.getMonth() + 1) + '-'
+          var D = date.getDate() + ' '
+          var H = date.getHours() +":" 
+          var S= date.getMinutes()  
+          return Y + M + D +H +S
+      }
       return {
         searchkeyword,
         bartitle,
@@ -156,6 +188,7 @@
         handleDelete,
         goBack,pickerDate,
         handelSearch,
+        timemapTostr,
       };
     },
   });
